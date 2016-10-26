@@ -1,0 +1,22 @@
+﻿<?xml version="1.0"?>
+<PARCELA>
+	<ID_EMP></ID_EMP>		<!-- 80 - RCC -->
+	<ID_FIL></ID_FIL>		<!-- 01 – SP | 02 – CAMPINAS | 03 – PE | 04 – DF | 05 – BA | 06 – RJ -->
+	<ID_PROC></ID_PROC>		<!-- 001 – CLIENTE | 002 - CONTRATO | 003 - EXECUÇÃO | 004 - FATURAMENTO -->
+	<PROCES></PROCES>
+	<ID_TRANS></ID_TRANS>	<!-- 1 – INCLUIR | 2 – ESTORNAR -->
+	<TRANSAC></TRANSAC>
+	<ID_ORI></ID_ORI>		<!-- 1 - PROTHEUS | 2 - PULSAR | 3 - SCTV | 4 - MÍDIA+ -->
+	<ID_DES></ID_DES>		<!-- 1 - PROTHEUS | 2 - PULSAR | 3 - SCTV | 4 - MÍDIA+ -->
+	<PARCELAS>
+		<PARCELA>
+			<ID_TIT></ID_TIT>	<!-- CODIGO DO TITULO/PARCELA (PULSAR) -->
+			<ID_RET></ID_RET>	<!-- CODIGO DO TITULO/PARCELA (PROTHEUS) -->
+			<DATA_PROCESSO></DATA_PROCESSO>	<!-- Data de baixa da parcela -->
+			<VALOR_BAIXA></VALOR_BAIXA>		<!-- Valor de baixa da parcela -->
+			<VALOR_ACRESCIMO></VALOR_ACRESCIMO>	<!-- Caso não tenha valor, informar 0.00 -->
+			<VALOR_DESCONTO></VALOR_DESCONTO>	<!-- Caso não tenha valor, informar 0.00 -->
+			<OBSERVACOES></OBSERVACOES>
+		</PARCELA>
+	</PARCELAS>
+</PARCELA>

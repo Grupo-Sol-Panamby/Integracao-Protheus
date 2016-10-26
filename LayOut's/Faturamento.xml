@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<FATURAMENTO>
+	<ID_EMP></ID_EMP>		<!-- 80 - RCC -->
+	<ID_FIL></ID_FIL>		<!-- 01 – SP | 02 – CAMPINAS | 03 – PE | 04 – DF | 05 – BA | 06 – RJ -->
+	<ID_PROC></ID_PROC>		<!-- 001 – CLIENTE | 002 - FATURAMENTO | 003 – PEDIDO DE VENDA | 004 – NOTA FISCAL | 005 – TITULO FINANCEIRO (PARCELA) -->
+	<PROCES></PROCES>
+	<ID_TRANS></ID_TRANS>	<!-- 1 – INCLUIR | 2 – ALTERAR | 3 – EXCLUIR | 4 – BLOQUEAR | 5 – DESBLOQUEAR | 6 – IMPRIMIR | 7 – BAIXAR | 8 - CANCELAR -->
+	<TRANSAC></TRANSAC>
+	<ID_ORI></ID_ORI>		<!-- 1 - PROTHEUS | 2 - PULSAR | 3 - SCTV | 4 - MÍDIA+ -->
+	<ID_DES></ID_DES>		<!-- 1 - PROTHEUS | 2 - PULSAR | 3 - SCTV | 4 - MÍDIA+ -->
+	<ID_FAT></ID_FAT>		<!-- CODIGO DO FATURAMENTO CADASTRADO (PULSAR) -->
+	<ID_CLI></ID_CLI>		<!-- Código do cliente no Protheus -->
+	<ID_AGE></ID_AGE>		<!-- Código da agência no Protheus, podendo ir VAZIO caso não seja informada uma agência -->
+	<ID_VEN></ID_VEN>		<!-- Código do contato no Protheus, podendo ir VAZIO caso não seja informado um contato -->
+	<VLR_BRUTO></VLR_BRUTO>	<!-- Valor bruto do contrato -->
+	<DESC_AGE></DESC_AGE>		<!-- Desconto agência, podendo vir 0.00 se não for informado -->
+	<FORMA_PAGTO_AGE></FORMA_PAGTO_AGE>	<!-- Forma de recebimento da agência - 0 - RESTITUIR e 1 - DESCONTAR -->
+	<VLR_LIQ></VLR_LIQ>	<!-- Valor liquido do contrato -->
+	<VIG_INI></VIG_INI>	<!-- Início de veiculação -->
+	<VIG_FIM></VIG_FIM>	<!-- Término de veiculação -->
+	<TOT_INS></TOT_INS>
+	<NOTAS_FICAIS>
+		<NOTA_FICAL>
+			<ID_NF></ID_NF>	<!-- CODIGO DA NOTA FISCAL (PULSAR) -->
+			<PARCELAS>
+				<PARCELA>
+					<ID_TIT></ID_TIT>		<!-- CODIGO DO TITULO/PARCELA CADASTRADO (PULSAR) -->
+					<DT_VENC></DT_VENC>		<!-- Vencimento da parcela -->
+					<VLR_BRU></VLR_BRU>		<!-- Valor bruto da parcela -->
+					<DESC></DESC>			<!-- Desconto -->
+					<VLR_LIQ></VLR_LIQ>		<!-- Valor líquido da parcela -->
+					<PLANO_CONTAS></PLANO_CONTAS>	<!-- Plano de contas cadastrado no sistema Pulsar, podendo ser o código de cadastro do Pulsar ou a descrição -->
+					<HISTORICO></HISTORICO>	<!-- histórico cadastrado no sistema Pulsar, podendo ser o código de cadastro do Pulsar ou a descrição -->
+				</PARCELA>
+			</PARCELAS>
+		</NOTA_FICAL>
+	</NOTAS_FICAIS>
+</FATURAMENTO>
