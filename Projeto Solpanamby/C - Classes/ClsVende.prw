@@ -10,12 +10,12 @@ Return Nil
 @version 		1.0
 /*/
 Class VendSP From uExecAuto
-    Data cCodigo
-    
-    Method New()
+	Data cCodigo
+
+	Method New()
 	Method AddValues(cCampo, xValor)
-    Method Gravacao(nOpcao)
-    Method GetCodigo()
+	Method Gravacao(nOpcao)
+	Method GetCodigo()
 EndClass
 
 /*/{Protheus.doc} new
@@ -29,7 +29,6 @@ Method New() Class VendSP
 	::aTabelas	:= {"SA3"}
 	::cFileLog	:= "MATA040.LOG"
 	::cCodigo	:= ""
-	
 Return Self
 
 /*/{Protheus.doc} AddValues
@@ -38,13 +37,11 @@ Return Self
 @version 		1.0
 /*/
 Method AddValues(cCampo, xValor) Class VendSP
-
 	If AllTrim(cCampo) == "A3_COD"
 		::cCodigo := xValor
 	EndIf
-	
-	_Super:AddValues(cCampo, xValor)
 
+	_Super:AddValues(cCampo, xValor)
 Return Nil
 
 /*/{Protheus.doc} Gravacao
@@ -53,69 +50,66 @@ Return Nil
 @version 		1.0
 /*/
 Method Gravacao(nOpcao) Class VendSP
-	Local lRetorno		:= .T.
+	Local lRetorno := .T.
 
-	Private	lMsErroAuto	:= .F.
-	
+	Private lMsErroAuto := .F.
+
 	::SetEnv(1, "FAT")
 
 	// Controle de Transacao
 	Begin Transaction
+		DbSelectArea("SA3")
+		DbSetOrder(1)
 
-	DbSelectArea("SA3")
-	DbSetOrder(1)
-
-	If nOpcao == 3
-		If Empty(::cCodigo)
-			lRetorno := .F.
-			::cMensagem := "Vendedor não informado."
-		EndIf
-	Else
-		If Empty(::cCodigo)
-			lRetorno 	:= .F.
-			::cMensagem := "Vendedor não informado."
+		If nOpcao == 3
+			If Empty(::cCodigo)
+				lRetorno := .F.
+				::cMensagem := "Vendedor não informado."
+			EndIf
 		Else
-			If !SA3->(DbSeek(xFilial("SA3") + ::cCodigo))
-				//Caso for Alteracao e Nao encontrar, inclui o Vendedor
-				If nOpcao == 4
-					nOpcao := 3
-				Else
-					lRetorno	:= .F.
-					::cMensagem	:= "Vendedor " + ::cCodigo + " não cadastrado."
+			If Empty(::cCodigo)
+				lRetorno := .F.
+				::cMensagem := "Vendedor não informado."
+			Else
+				If !SA3->(DbSeek(xFilial("SA3") + ::cCodigo))
+					//Caso for Alteracao e Nao encontrar, inclui o Vendedor
+					If nOpcao == 4
+						nOpcao := 3
+					Else
+						lRetorno := .F.
+						::cMensagem := "Vendedor " + ::cCodigo + " não cadastrado."
+					EndIf
 				EndIf
 			EndIf
 		EndIf
-	EndIf
 
-	If lRetorno
+		If lRetorno
+			::AddValues("A3_FILIAL", xFilial("SA3"))
 
-		::AddValues("A3_FILIAL", xFilial("SA3"))
+			//Gravacao do Pedido de Compra
+			MSExecAuto({|a, b| MATA040(a, b)}, ::aValues, nOpcao)
 
-		//Gravacao do Pedido de Compra
-		MSExecAuto({|a, b| MATA040(a, b)}, ::aValues, nOpcao)
-	
-		If lMsErroAuto
-			lRetorno := .F.
+			If lMsErroAuto
+				lRetorno := .F.
 
-			If ::lExibeTela
-				MostraErro()
-			EndIf
-			
-			If ::lGravaLog
-				::cMensagem := MostraErro(::cPathLog, ::cFileLog)
+				If ::lExibeTela
+					MostraErro()
+				EndIf
+
+				If ::lGravaLog
+					::cMensagem := MostraErro(::cPathLog, ::cFileLog)
+				EndIf
 			EndIf
 		EndIf
-	EndIf
 
-	If !lRetorno
-		DisarmTransaction()
-	EndIf
-	
+		If !lRetorno
+			DisarmTransaction()
+		EndIf
+
 	//Encerra a Transacao
 	End Transaction
 
 	::SetEnv(2, "FAT")
-	
 Return lRetorno
 
 /*/{Protheus.doc} GetCodigo

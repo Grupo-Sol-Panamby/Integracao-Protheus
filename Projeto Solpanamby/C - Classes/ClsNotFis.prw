@@ -15,7 +15,8 @@ Class NFSaida From uExecAuto
 	Data cNumero
 	Data cNumNFS
 	Data cSerNFS
-	
+	Data cPedido
+
 	Method New()
 	Method AddCabec(cCampo, xValor)
 	Method VerSX6()
@@ -33,13 +34,14 @@ EndClass
 /*/
 Method New() Class NFSaida
 	_Super:New()
-	::aTabelas	:= {"SA1","SB1","SB2","SF4","SC5","SC6","SC9"}
-	::cNumero	:= ""
-	::cCliente	:= ""
-	::cLojaCli	:= ""
-	::cNumero	:= ""
-	::cNumNFS	:= ""
-	::cSerNFS	:= ""
+	::aTabelas := {"SA1","SB1","SB2","SF4","SC5","SC6","SC9"}
+	::cNumero := ""
+	::cCliente := ""
+	::cLojaCli := ""
+	::cNumero := ""
+	::cNumNFS := ""
+	::cSerNFS := ""
+	::cPedido := ""
 Return Self
 
 /*/{Protheus.doc} AddCabec
@@ -48,17 +50,17 @@ Return Self
 @version 		1.0
 /*/
 Method AddCabec(cCampo, xValor) Class NFSaida
-
 	If Alltrim(cCampo) == "C9_CLIENTE"
-		::cCliente 	:= xValor
+		::cCliente := xValor
 	ElseIf Alltrim(cCampo) == "C9_LOJA"
-		::cLojaCli 	:= xValor
+		::cLojaCli := xValor
 	ElseIf Alltrim(cCampo) == "C9_NFISCAL"
-		::cNumNFS	:= xValor
+		::cNumNFS := xValor
 	ElseIf Alltrim(cCampo) == "C9_SERIENF"
-		::cSerNFS	:= xValor
+		::cSerNFS := xValor
+	ElseIf Alltrim(cCampo) == "C9_PEDIDO"
+		::cPedido := xValor
 	EndIf
-
 Return Nil
 
 /*/{Protheus.doc} VerSX6
@@ -67,10 +69,10 @@ Return Nil
 @version 		1.0
 /*/
 Method VerSX6() Class NFSaida
-	Local lRetorno	:= .T.
-	Local lContinua	:= .T.
-	Local nVezes   	:= 0
-	
+	Local lRetorno := .T.
+	Local lContinua := .T.
+	Local nVezes := 0
+
 	ConOut("Verificando Parametro SX6 (MV_NUMITEN)")
 
 	If ( GetMv("MV_NUMITEN",.T.) )
@@ -83,16 +85,15 @@ Method VerSX6() Class NFSaida
 			If ( nVezes > 200 )
 				lContinua := .F.
 			EndIf
-
 		EndDo
 	Else
 		lContinua := .F.
 	EndIf
-	
+
 	If !lContinua
 		lRetorno := .F.
 	EndIf
-	
+
 	//Destrava Parametro
 	If ( GetMv("MV_NUMITEN",.T.) )
 		ConOut("Destravando SX6")
@@ -100,7 +101,6 @@ Method VerSX6() Class NFSaida
 	Else
 		ConOut("Destravando SX6")
 	EndIf
-    
 Return lRetorno
 
 /*/{Protheus.doc} VerSX5
@@ -109,46 +109,44 @@ Return lRetorno
 @version 		1.0
 /*/
 Method VerSX5() Class NFSaida
-	Local lRetorno	:= .T.
-	Local lLocked 	:= .F.
-	Local cTabela	:= "01"
-	Local nContador	:= 0
-	
+	Local lRetorno := .T.
+	Local lLocked := .F.
+	Local cTabela := "01"
+	Local nContador := 0
+
 	ConOut("Verificando Numeração de NF, Série: " + ::cSerNFS)
-	
+
 	DbSelectArea( "SX5" )
 	SX5->(DbSetOrder(1))
+
 	If SX5->(MsSeek( xFilial("SX5") + cTabela + ::cSerNFS,.F.))
 		While !lLocked .And. (++nContador < 200)
-			
 			ConOut("Tentando Reservar SX5, Tentativa: " + Alltrim(Str(nContador)) )
-			
+
 			If InTransact()
 				lLocked := RecLock("SX5")
 			Else
 				lLocked := MsRLock()
 			EndIf
-			
+
 			If !lLocked
 				Inkey(1)
 				ConOut("Tentativa: " + Alltrim(Str(nContador)) + " Sem Sucesso")
 			Else
 				ConOut("Tentativa: " + Alltrim(Str(nContador)) + " Com Sucesso")
 			EndIf
-		
 		End
- 	Else
- 		lRetorno 	:= .F.
- 		::cMensagem	:= "Série: " + ::cSerNFS + " Não encontrada na Tabela SX5"
-    EndIf
-    
-    If lRetorno
-    	If !lLocked
-    		lRetorno 	:= .F.
-    		::cMensagem	:= "Não foi possível reservar numeração de NF na tabela SX5, Contate Suporte"
-    	EndIf
-    EndIf
-    
+	Else
+		lRetorno 	:= .F.
+		::cMensagem	:= "Série: " + ::cSerNFS + " Não encontrada na Tabela SX5"
+	EndIf
+
+	If lRetorno
+		If !lLocked
+			lRetorno 	:= .F.
+			::cMensagem	:= "Não foi possível reservar numeração de NF na tabela SX5, Contate Suporte"
+		EndIf
+	EndIf
 Return lRetorno
 
 /*/{Protheus.doc} Gravacao
@@ -157,31 +155,31 @@ Return lRetorno
 @version 		1.0
 /*/
 Method Gravacao(nOpcao) Class NFSaida
-	Local dDataBackup	:= dDataBase
-	Local cSeek      	:= ""
-	Local lRetorno		:= .T.
-	Local nRegDAK   	:= 0
-	Local nPrcVen    	:= 0
-	Local aPvlNfs	 	:= {}
-	
-	Local lMostraCtb 	:= .F.
-	Local lAglutCtb  	:= .F.
-	Local lCtbOnLine 	:= .F.
-	Local lCtbCusto  	:= .F.
-	Local lReajuste  	:= .F.
-	Local lAtuSA7lECF	:= .F.
+	Local dDataBackup := dDataBase
+	Local cSeek := ""
+	Local lRetorno := .T.
+	Local nRegDAK := 0
+	Local nPrcVen := 0
+	Local aPvlNfs := {}
 
-	Local nCalAcrs   	:= 1
-	Local nArredPrcLis 	:= 1
+	Local lMostraCtb := .F.
+	Local lAglutCtb := .F.
+	Local lCtbOnLine := .F.
+	Local lCtbCusto := .F.
+	Local lReajuste := .F.
+	Local lAtuSA7lECF := .F.
 
-	Local lRetorno		:= .T.
-	Local lAddItem		:= .F.
-	Local lEmitida		:= .F.
-	Local nPosPed		:= 0
-	Local nPosItem		:= 0
-	Local nPosProd		:= 0
-	Local nPosQtVd		:= 0
-	Local nI			:= 0
+	Local nCalAcrs := 1
+	Local nArredPrcLis := 1
+
+	Local lRetorno := .T.
+	Local lAddItem := .F.
+	Local lEmitida := .F.
+	Local nPosPed := 0
+	Local nPosItem := 0
+	Local nPosProd := 0
+	Local nPosQtVd := 0
+	Local nI := 0
 
 	::SetEnv(1, "FAT")
 
@@ -192,12 +190,10 @@ Method Gravacao(nOpcao) Class NFSaida
 
 	//Chama liberacao do pedido
 	::LibPed()
-	
+
 	// Controle de Transacao
 	Begin Transaction
-
 		If nOpcao == 3
-
 			DbSelectarea("SD2")
 			DbSelectarea("SD1")
 			DbSelectarea("SD3")
@@ -210,10 +206,10 @@ Method Gravacao(nOpcao) Class NFSaida
 			DbSelectArea("SF4")
 
 			For nI := 1 To Len( ::aItens )
-				nPosPed			:= Ascan( ::aItens[nI], {|x| x[01] == "C9_PEDIDO"	})
-				nPosItem		:= Ascan( ::aItens[nI], {|x| x[01] == "C9_ITEM"		})
-				nPosProd		:= Ascan( ::aItens[nI], {|x| x[01] == "C9_PRODUTO"	})
-				nPosQtVd		:= Ascan( ::aItens[nI], {|x| x[01] == "C9_QTDLIB"	})
+				nPosPed := Ascan( ::aItens[nI], {|x| x[01] == "C9_PEDIDO" })
+				nPosItem := Ascan( ::aItens[nI], {|x| x[01] == "C9_ITEM" })
+				nPosProd := Ascan( ::aItens[nI], {|x| x[01] == "C9_PRODUTO" })
+				nPosQtVd := Ascan( ::aItens[nI], {|x| x[01] == "C9_QTDLIB" })
 
 				If nPosPed > 0 .And. nPosItem > 0 .AND. nPosProd > 0 .AND. nPosQtVd > 0
 
@@ -276,8 +272,8 @@ Method Gravacao(nOpcao) Class NFSaida
 												lEmitida := .F.
 											Else
 												::cMensagem += "Erro durante Geraçào da NF. Pedido com Bloqueios ou Quant. diferente da Liberada." + CRLF
-												lRetorno	:= .F.
-												nI			:= Len(::aItens)
+												lRetorno := .F.
+												nI := Len(::aItens)
 											EndIf
 										Else
 											lEmitida := .T.
@@ -287,35 +283,35 @@ Method Gravacao(nOpcao) Class NFSaida
 									End
 
 									If lEmitida
-										::cMensagem	:= "Nota fiscal Já Emitida Para Esse Pedido / Item"
-										lRetorno 	:= .F.
+										::cMensagem := "Nota fiscal Já Emitida Para Esse Pedido / Item"
+										lRetorno := .F.
 									ElseIf !lAddItem
 										::cMensagem += " 01 - Liberação do Item " + ::aItens[nI][nPosItem][02] + " não encontrada."
-										lRetorno	:= .F.
-										nI			:= Len(::aItens)
+										lRetorno := .F.
+										nI := Len(::aItens)
 									EndIf
 
 								Else
 									::cMensagem += " 02 - Liberação do Item " + ::aItens[nI][nPosItem][02] + " não encontrada."
-									lRetorno	:= .F.
-									nI			:= Len(::aItens)
+									lRetorno := .F.
+									nI := Len(::aItens)
 								EndIf
-								
+
 								SC6->( DbSkip() )
 							End
 						Else
-							::cMensagem	:= "Item " + ::aItens[nI][nPosItem][02] + " não encontrado."
-							lRetorno 	:= .F.
-							nI			:= Len(::aItens)
+							::cMensagem := "Item " + ::aItens[nI][nPosItem][02] + " não encontrado."
+							lRetorno := .F.
+							nI := Len(::aItens)
 						EndIf
 					Else
-						::cMensagem	:= "Pedido " + ::aItens[nI][nPosPed][02] + " não encontrado."
-						lRetorno 	:= .F.
+						::cMensagem := "Pedido " + ::aItens[nI][nPosPed][02] + " não encontrado."
+						lRetorno := .F.
 					EndIf
 				Else
-					::cMensagem	:= "Os Campos Obrigatórios dos Itens não foram informados."
-					lRetorno	:= .F.
-					nI			:= Len(::aItens)
+					::cMensagem := "Os Campos Obrigatórios dos Itens não foram informados."
+					lRetorno := .F.
+					nI := Len(::aItens)
 				EndIf
 			Next nI
 
@@ -326,7 +322,7 @@ Method Gravacao(nOpcao) Class NFSaida
 
 			//Verifica se SX5 esta disponivel
 			If lRetorno
-				lRetorno := ::VerSX5()
+				//lRetorno := ::VerSX5()
 			EndIf
 
 			If lRetorno
@@ -336,12 +332,12 @@ Method Gravacao(nOpcao) Class NFSaida
 											nArredPrcLis,	lAtuSA7lECF)
 
 					If Empty(::cNumero)
-						::cMensagem	:= "Erro durante a Preparação da Nota Fiscal de Saída."
-						lRetorno	:= .F.
+						::cMensagem := "Erro durante a Preparação da Nota Fiscal de Saída."
+						lRetorno := .F.
 					EndIf
 				Else
-					::cMensagem	+= CRLF + "Erro durante a Preparação da Nota Fiscal de Saída."
-					lRetorno	:= .F.
+					::cMensagem += CRLF + "Erro durante a Preparação da Nota Fiscal de Saída."
+					lRetorno := .F.
 				EndIf
 			EndIf
 		EndIf
@@ -354,7 +350,6 @@ Method Gravacao(nOpcao) Class NFSaida
 	End Transaction
 
 	::SetEnv(2, "FAT")
-
 Return lRetorno
 
 /*/{Protheus.doc} GetSerie
@@ -379,21 +374,21 @@ Return ::cNumero
 @version 		1.0
 /*/
 Method LibPed() Class NFSaida
-	Local aAreaAt	:= GetArea()
-	Local nPosItem	:= 0
-	Local nPosQtVd	:= 0
-	Local nPosPed	:= 0
-	Local nPosPro	:= 0
-	Local nQtdLib	:= 0
+	Local aAreaAt := GetArea()
+	Local nPosItem := 0
+	Local nPosQtVd := 0
+	Local nPosPed := 0
+	Local nPosPro := 0
+	Local nQtdLib := 0
 
-	Local lCredito 	:= .F.
-	Local lEstoque 	:= .F.
+	Local lCredito := .F.
+	Local lEstoque := .F.
 
-	Local lLiber	:= .F.
-	Local lFatur	:= .F.
-	Local lRejeit	:= .F.
+	Local lLiber := .F.
+	Local lFatur := .F.
+	Local lRejeit := .F.
 
-	Local nX		:= 0
+	Local nX := 0
 
 	DbSelectarea("SC9")
 	SC9->( DbSetorder(1) )	//C9_FILIAL+C9_PEDIDO+C9_ITEM+C9_SEQUEN+C9_PRODUTO
@@ -401,12 +396,54 @@ Method LibPed() Class NFSaida
 	DbSelectarea("SC6")
 	SC6->( DbSetorder(1) )	//C6_FILIAL+C6_NUM+C6_ITEM+C6_PRODUTO
 
+	//Faz o estorno dos itens para fazer nova liberacao
+	DbSelectarea("SC5")
+	SC5->( DbSetorder(1) )
+	If SC5->( DbSeek( xFilial("SC5") + ::cPedido ) )
+		DbSelectarea("SC6")
+		SC6->( DbSetorder(1) )
+
+		If SC6->( DbSeek( xFilial("SC6") + ::cPedido ) )
+			While !SC6->( Eof() ) .And.	SC6->C6_FILIAL == xFilial("SC6") .And.;
+										SC6->C6_NUM == ::cPedido
+
+				DbSelectarea("SC9")
+				SC9->(DbSetorder(1))
+
+				If SC9->( DbSeek(xFilial("SC9") + SC6->C6_NUM + SC6->C6_ITEM ) )
+					While !SC9->( Eof() ) .And.	SC9->C9_FILIAL == xFilial("SC9") .And.;
+												SC9->C9_PEDIDO == SC6->C6_NUM .And.;
+												SC9->C9_ITEM == SC6->C6_ITEM
+
+						lFatur	:= SC9->C9_BLCRED == "10" .And. SC9->C9_BLEST == "10"
+
+						//Faz o Estorno por Item caso nao tenha sido faturado
+						If !lFatur
+							RecLock( "SC6", .F. )
+								MaAvalSC6( "SC6", 4, "SC5" )
+							SC6->( MsUnlock() )
+						EndIf
+
+						SC9->( DbSkip() )
+					End
+				Else
+					MsgAlert( "PV / Item: " + SC6->C6_NUM + " / " + SC6->C6_ITEM + " sem liberação, nao será estornado" )
+				EndIf
+
+				SC6->( DbSkip() )
+			End
+			//Atualiza campos de Bloqueio
+			SC6->( MaLiberOk( { ::cPedido } ) )
+		EndIf
+	EndIf
+
+	//Faz a liberacao do pedido
 	For nX := 1 To Len( ::aItens )
-		nPosPed		:= Ascan( ::aItens[nX], { |x| x[01] == "C9_PEDIDO"	})
-		nPosItem	:= Ascan( ::aItens[nX], { |x| x[01] == "C9_ITEM"	})
-		nPosQtVd	:= Ascan( ::aItens[nX], { |x| x[01] == "C9_QTDLIB"	})
-		nPosPro		:= Ascan( ::aItens[nX], { |x| x[01] == "C9_PRODUTO"	})
-		
+		nPosPed := Ascan( ::aItens[nX], { |x| x[01] == "C9_PEDIDO"	})
+		nPosItem := Ascan( ::aItens[nX], { |x| x[01] == "C9_ITEM"	})
+		nPosQtVd := Ascan( ::aItens[nX], { |x| x[01] == "C9_QTDLIB"	})
+		nPosPro := Ascan( ::aItens[nX], { |x| x[01] == "C9_PRODUTO"	})
+
 		If nPosPed > 0 .And. nPosItem > 0 .And. nPosQtVd > 0
 			If SC6->( DbSeek(xFilial("SC6") + ::aItens[nX][nPosPed][02] + ::aItens[nX][nPosItem][02] + ::aItens[nX][nPosPro][02]) )
 
@@ -420,27 +457,27 @@ Method LibPed() Class NFSaida
 							nQtdLib := MaLibDoFat( SC6->( RecNo() ), nQtdLib, @lCredito, @lEstoque, .T., .T., .T., .F., Nil, Nil, Nil, Nil, Nil, Nil, 0 )
 						End Transaction
 					MsUnlock()
-
 				EndIf
-				
+
 				//Verifica liberacao
 				If SC9->( DbSeek(xFilial("SC9") + SC6->C6_NUM + SC6->C6_ITEM ) )
-					lLiber	:= Empty(SC9->C9_BLCRED) .And. Empty(SC9->C9_BLEST)
-					lFatur	:= SC9->C9_BLCRED == "10" .And. SC9->C9_BLEST == "10"
-					lRejeit	:= SC9->C9_BLCRED == "09"
-				
-					//Forcao liberacao de credito e estoque conforme definido com Alexandre (T.I.)
-					If !lLiber .And. !lFatur .And. !lRejeit
-						a450Grava(1, .T., .T., .F.)
-					EndIf
-					
+					While !SC9->( Eof() ) .And.	SC9->C9_FILIAL == xFilial("SC9") .And.;
+												SC9->C9_PEDIDO == SC6->C6_NUM .And.;
+												SC9->C9_ITEM == SC6->C6_ITEM
+
+						lLiber := Empty(SC9->C9_BLCRED) .And. Empty(SC9->C9_BLEST)
+						lFatur := SC9->C9_BLCRED == "10" .And. SC9->C9_BLEST == "10"
+						lRejeit := SC9->C9_BLCRED == "09"
+
+						//Forcao liberacao de credito e estoque conforme definido com Alexandre (T.I.)
+						If !lLiber .And. !lFatur .And. !lRejeit
+							a450Grava(1, .T., .T., .F.)
+						EndIf
+					End
 				EndIf
-			
 			EndIf
 		EndIf
-
 	Next nX
-	
+
 	RestArea( aAreaAt )
-	
 Return Nil

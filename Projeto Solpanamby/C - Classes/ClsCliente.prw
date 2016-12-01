@@ -18,7 +18,7 @@ Class ClienteSP From uExecAuto
     Data cCidade
     Data cCodMun
     Data cUF
-    
+
     Method New()
 	Method AddValues(cCampo, xValor)
     Method Gravacao(nOpcao)
@@ -34,16 +34,15 @@ EndClass
 Method New() Class ClienteSP
 	_Super:New()
 
-	::aTabelas	:= {"SA1"}
-	::cCodigo	:= ""
-	::cLoja		:= ""
-	::cChave	:= ""
-	::cTpCli	:= ""
-	::cCidade	:= ""
-	::cUF		:= ""
-	::cCodMun	:= ""
-	::cFileLog	:= "MATA030.LOG"
-
+	::aTabelas := {"SA1"}
+	::cCodigo := ""
+	::cLoja := ""
+	::cChave := ""
+	::cTpCli := ""
+	::cCidade := ""
+	::cUF := ""
+	::cCodMun := ""
+	::cFileLog := "MATA030.LOG"
 Return Self
 
 /*/{Protheus.doc} AddValues
@@ -54,7 +53,6 @@ Return Self
 @version 		1.0
 /*/
 Method AddValues(cCampo, xValor) Class ClienteSP
-
 	If AllTrim(cCampo) == "A1_CGC"
 		::cChave := xValor
 	EndIf
@@ -68,15 +66,14 @@ Method AddValues(cCampo, xValor) Class ClienteSP
 		::cLoja := PadR(xValor, TamSx3("A1_LOJA")[1])
 	EndIf
 	If Alltrim(cCampo) == "A1_MUN"
-		xValor		:= Upper(xValor)
-		::cCidade	:= PadR(xValor, TamSx3("A1_MUN")[1])
+		xValor := Upper(xValor)
+		::cCidade := PadR(xValor, TamSx3("A1_MUN")[1])
 	EndIf
 	If Alltrim(cCAmpo) == "A1_EST"
-		::cUF		:= PadR(xValor, TamSx3("A1_EST")[1])
+		::cUF := PadR(xValor, TamSx3("A1_EST")[1])
 	EndIf
 
 	_Super:AddValues(cCampo, xValor)
-
 Return Nil
 
 /*/{Protheus.doc} Gravacao
@@ -85,177 +82,172 @@ Return Nil
 @version 		1.0
 /*/
 Method Gravacao(nOpcao) Class ClienteSP
-	Local dDataBackup	:= dDataBase
-	Local cSeek			:= ""
-	Local lAchou		:= .F.
-	Local lReserva		:= .F.
-	Local lRetorno		:= .T.
-	
+	Local dDataBackup := dDataBase
+	Local cSeek := ""
+	Local lAchou := .F.
+	Local lReserva := .F.
+	Local lRetorno := .T.
+
 	::SetEnv(1, "FAT")
 
 	//=========================================
 	// Inicia transacao
 	//=========================================
 	Begin Transaction
+		DbSelectArea("SA1")
 
-	DbSelectArea("SA1")
+		If nOpcao == 3
+			If !Empty(::cCodigo) .And. !Empty(::cLoja)
 
-	If nOpcao == 3
-		If !Empty(::cCodigo) .And. !Empty(::cLoja)
-			
-			ConOut( "Inclusao de cliente - Codigo e Loja preenchido" )
-			
-			SA1->(DbSetOrder(1))//A1_FILIAL, A1_COD, A1_LOJA
-			If SA1->(DbSeek(xFilial("SA1") + ::cCodigo + ::cLoja))
-				lRetorno 	:= .F.
-				::cMensagem	:= "Cliente / Loja já cadastrado.
-			EndIf
-		Else
+				ConOut( "Inclusao de cliente - Codigo e Loja preenchido" )
 
-			ConOut( "Inclusao de cliente" )
-
-			DbSetOrder(3)//A1_FILIAL, A1_CGC
-			If Empty(::cTpCli) .OR. Empty(::cChave)
-		    	lRetorno 	:= .F.
-		    	::cMensagem	:= "Um dos campos Obrigatorios não foi informado. (ClsCliente)"
+				SA1->(DbSetOrder(1))//A1_FILIAL, A1_COD, A1_LOJA
+				If SA1->(DbSeek(xFilial("SA1") + ::cCodigo + ::cLoja))
+					lRetorno := .F.
+					::cMensagem := "Cliente / Loja já cadastrado.
+				EndIf
 			Else
-				If ::cTpCli == "J"
-					cSeek	:= Substr(::cChave, 1, 8)
-					lAchou	:= SA1->(DbSeek(xFilial("SA1") + cSeek))
+
+				ConOut( "Inclusao de cliente" )
+
+				DbSetOrder(3)//A1_FILIAL, A1_CGC
+				If Empty(::cTpCli) .OR. Empty(::cChave)
+					lRetorno := .F.
+					::cMensagem := "Um dos campos Obrigatorios não foi informado. (ClsCliente)"
 				Else
-					cSeek	:= AllTrim(::cChave)
-					lAchou	:= SA1->(DbSeek(xFilial("SA1") + cSeek))
-				EndIf
-		
-				DbSetOrder(1)//A1_FILIAL, A1_COD, A1_LOJA
-				
-				If lAchou
-					
-					ConOut("Verificando base de CNPJ")
-					
-					//Guarda o Codigo do Cliente
-					::cCodigo 	:= SA1->A1_COD
-					::cLoja		:= SA1->A1_LOJA
-		
-					While !SA1->(Eof()) .And. 	SA1->A1_FILIAL == xFilial("SA1") .And.;
-												SA1->A1_COD == ::cCodigo
-						
-						If AllTrim(::cChave) == AllTrim(SA1->A1_CGC)
-							//Caso o Cliente Ja exista, atualiza os dados
-							nOpcao	:= 4
-						EndIf
-		
-						SA1->(DbSkip())
-					End
-		
-					If lRetorno .And. nOpcao == 3
-						::cLoja := Soma1(::cLoja)
+					If ::cTpCli == "J"
+						cSeek := Substr(::cChave, 1, 8)
+						lAchou := SA1->(DbSeek(xFilial("SA1") + cSeek))
+					Else
+						cSeek := AllTrim(::cChave)
+						lAchou := SA1->(DbSeek(xFilial("SA1") + cSeek))
 					EndIf
-				Else
-					
-					ConOut("Nao encontrado base de CNPJ")
 
-					lReserva	:= .T.
-					::cCodigo	:= GetSx8Num("SA1", "A1_COD")
-					::cLoja		:= StrZero( 1, TamSx3("A1_LOJA")[1] )
-					
-				EndIf
-				
-				::AddValues("A1_COD"	,::cCodigo	)
-				::AddValues("A1_LOJA"	,::cLoja	)
-		    EndIf
-	    EndIf
-	Else
-		DbSetOrder(1)//A1_FILIAL, A1_COD, A1_LOJA
-		
-		If Empty(::cCodigo) .OR. Empty(::cLoja)
-			lRetorno	:= .F.
-			::cMensagem	:= "Cliente / Loja não informados."
-		Else
-			If !SA1->(DbSeek(xFilial("SA1") + ::cCodigo + ::cLoja))
-				If nOpcao <> 4
-					lRetorno	:= .F.
-					::cMensagem	:= "Cliente / Loja: " + ::cCodigo + "/" + ::cLoja + " não localizado."
-				Else
-					nOpcao := 3 //Caso nao encontre, inclui novo
-				EndIf
-			EndIf
-		EndIf
-	EndIf
+					DbSetOrder(1)//A1_FILIAL, A1_COD, A1_LOJA
 
-	//Atualiza Codigo de Municipio
-	If lRetorno
-		If Empty(::cCodMun)
-			
-			If !Empty(::cCidade) .And. !Empty(::cUF)
-				DbSelectarea("CC2")
-				DbSetorder(2)
-				If DbSeek(xFilial("CC2") + ::cCidade)
-					While !CC2->( Eof() ) .And. CC2->CC2_FILIAL == xFilial("CC2") .And.;
-												Alltrim(CC2->CC2_MUN) == Alltrim(::cCidade)
-		
-						If Alltrim(CC2->CC2_EST) == Alltrim(::cUF)
-							::cCodMun	:= Alltrim(CC2->CC2_CODMUN)
+					If lAchou
+						ConOut("Verificando base de CNPJ")
+
+						//Guarda o Codigo do Cliente
+						::cCodigo := SA1->A1_COD
+						::cLoja := SA1->A1_LOJA
+
+						While !SA1->(Eof()) .And. 	SA1->A1_FILIAL == xFilial("SA1") .And.;
+													SA1->A1_COD == ::cCodigo
+
+							If AllTrim(::cChave) == AllTrim(SA1->A1_CGC)
+								//Caso o Cliente Ja exista, atualiza os dados
+								nOpcao	:= 4
+							EndIf
+
+							SA1->(DbSkip())
+						End
+
+						If lRetorno .And. nOpcao == 3
+							::cLoja := Soma1(::cLoja)
 						EndIf
-							
-						CC2->( DbSkip() )
-					End
+					Else
+
+						ConOut("Nao encontrado base de CNPJ")
+
+						lReserva := .T.
+						::cCodigo := GetSx8Num("SA1", "A1_COD")
+						::cLoja := StrZero( 1, TamSx3("A1_LOJA")[1] )
+
+					EndIf
+
+					::AddValues("A1_COD"	,::cCodigo	)
+					::AddValues("A1_LOJA"	,::cLoja	)
+			    EndIf
+		    EndIf
+		Else
+			DbSetOrder(1)//A1_FILIAL, A1_COD, A1_LOJA
+
+			If Empty(::cCodigo) .OR. Empty(::cLoja)
+				lRetorno := .F.
+				::cMensagem := "Cliente / Loja não informados."
+			Else
+				If !SA1->(DbSeek(xFilial("SA1") + ::cCodigo + ::cLoja))
+					If nOpcao <> 4
+						lRetorno := .F.
+						::cMensagem := "Cliente / Loja: " + ::cCodigo + "/" + ::cLoja + " não localizado."
+					Else
+						nOpcao := 3 //Caso nao encontre, inclui novo
+					EndIf
 				EndIf
-				
-				DbSelectarea("CC2")
-				DbSetorder(1)
-				DbGotop()
-	
-				Aadd(::aValues, { "A1_COD_MUN"	, ::cCodMun		, Nil	})
-	
 			EndIf
 		EndIf
-	EndIf
-	
-	If lRetorno
-	
-		::AddValues("A1_FILIAL", xFilial("SA1"))
 
-		//Inicia Variavel como .F. caso o Execauto caia, o retorno sera .F.
-		lRetorno := .F.
+		//Atualiza Codigo de Municipio
+		If lRetorno
+			If Empty(::cCodMun)
+				If !Empty(::cCidade) .And. !Empty(::cUF)
+					DbSelectarea("CC2")
+					DbSetorder(2)
 
-		//Gravacao do Cliente
-		MSExecAuto({|a, b| MATA030(a, b)}, ::aValues, nOpcao)
+					If DbSeek(xFilial("CC2") + ::cCidade)
+						While !CC2->( Eof() ) .And. CC2->CC2_FILIAL == xFilial("CC2") .And.;
+													Alltrim(CC2->CC2_MUN) == Alltrim(::cCidade)
 
-		If lMsErroAuto
+							If Alltrim(CC2->CC2_EST) == Alltrim(::cUF)
+								::cCodMun := Alltrim(CC2->CC2_CODMUN)
+							EndIf
+
+							CC2->( DbSkip() )
+						End
+					EndIf
+
+					DbSelectarea("CC2")
+					DbSetorder(1)
+					DbGotop()
+
+					Aadd(::aValues, { "A1_COD_MUN", ::cCodMun, Nil })
+				EndIf
+			EndIf
+		EndIf
+
+		If lRetorno
+			::AddValues("A1_FILIAL", xFilial("SA1"))
+
+			//Inicia Variavel como .F. caso o Execauto caia, o retorno sera .F.
 			lRetorno := .F.
 
-			If ::lExibeTela
-				MostraErro()
+			//Gravacao do Cliente
+			MSExecAuto({|a, b| MATA030(a, b)}, ::aValues, nOpcao)
+
+			If lMsErroAuto
+				lRetorno := .F.
+
+				If ::lExibeTela
+					MostraErro()
+				EndIf
+
+				If ::lGravaLog
+					::cMensagem := MostraErro(::cPathLog, ::cFileLog)
+				EndIf
+			Else
+
+				lRetorno	:= .T.
+
+				If lReserva
+					::cCodigo := SA1->A1_COD
+					::cLoja := SA1->A1_LOJA
+					ConfirmSx8()
+				EndIf
+
 			EndIf
-			
-			If ::lGravaLog
-				::cMensagem := MostraErro(::cPathLog, ::cFileLog)
-			EndIf
-		Else
-			
-			lRetorno	:= .T.
-			
-			If lReserva
-				::cCodigo	:= SA1->A1_COD
-				::cLoja		:= SA1->A1_LOJA
-				ConfirmSx8()
-			EndIf
-		
 		EndIf
-	EndIf
-	
-	If !lRetorno
-		DisarmTransaction()
-	EndIf
+
+		If !lRetorno
+			DisarmTransaction()
+		EndIf
 
 	//=========================================
 	// Encerra a Transacao.
 	//=========================================
 	End Transaction
-	
-	::SetEnv(2, "FAT")
 
+	::SetEnv(2, "FAT")
 Return lRetorno
 
 /*/{Protheus.doc} GetCodigo

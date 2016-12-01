@@ -27,7 +27,7 @@
 ÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜ
 */
 User Function M030INC()
-Local aAreaSA1 := SA1->(GetArea())
+Local aArea := SA1->(GetArea())
 
 If ParamIXB == 1
 	If SM0->M0_CODIGO $ "75|80" .AND. SA1->A1_MSBLQL <> "1"
@@ -38,7 +38,7 @@ If ParamIXB == 1
 	EndIf
 EndIf
 
-RestArea(aAreaSA1)
+RestArea(aArea)
 Return(Nil)
 
 /*

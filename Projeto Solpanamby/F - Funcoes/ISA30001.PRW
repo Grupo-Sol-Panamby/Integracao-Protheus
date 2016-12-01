@@ -65,11 +65,10 @@ STATUS	- 0 - AGUARDANDO PROCESSAMENTO
 ±±ÌÍÍÍÍÍÍÍÍÍÍÍÍØÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍ¹±±
 ±±º Uso        ³ Integracao do cadastro de vendedores                           º±±
 ±±ÌÍÍÍÍÍÍÍÍÍÍÍÍØÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍ¹±±
-±±º Parametros ³ INCLUI - L Indica inclusão                                     º±±
-±±º            ³ ALTERA - L Indica alteração                                    º±±
-±±º            ³ RETORNO - L Indica retorno                                     º±±
+±±º Parametros ³ INCLUI - L - Inclusão                                          º±±
+±±º            ³ ALTERA - L - Alteração                                         º±±
 ±±ÌÍÍÍÍÍÍÍÍÍÍÍÍØÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍ¹±±
-±±º Retorno    ³ Nil                                                            º±±
+±±º Retorno    ³ lRet - L - .T. OK / .F. Erro                                   º±±
 ±±ÌÍÍÍÍÍÍÍÍÍÍÍÍØÍÍÍÍÍÍÍÍÍÍÍÍÍÑÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍ¹±±
 ±±º Data       ³ Analista    ³Descricao da Alteracao                            º±±
 ±±º============³=============³==================================================º±±
@@ -78,12 +77,14 @@ STATUS	- 0 - AGUARDANDO PROCESSAMENTO
 ±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±
 ÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜ
 */
-User Function ISA30001(lInclui,lAltera,lRetorno)
+User Function ISA30001(lInclui,lAltera,lRetorno,nID)
 Local aDados := {}
 Local aIntegra := {}
 Local cAction := ""
 Local cDestino := ""
 Local cError := ""
+Local IDProc := "006"
+Local Proces := "Vendedor"
 Local cQuery := ""
 Local cRetorno := ""
 Local cWarning := ""
@@ -97,6 +98,7 @@ Private nCount := 0
 Default lInclui := .F.
 Default lAltera := .F.
 Default lRetorno := .F.
+Default nID := 0
 
 If SM0->M0_CODIGO == "70" //TVB CAMPINAS
 	cDestino := "4"
@@ -107,35 +109,35 @@ ElseIf SM0->M0_CODIGO == "80" //NOVA BRASIL FM
 EndIf
 
 If lRetorno
-	aIntegra := U_INTPQRY( SM0->M0_CODIGO, SM0->M0_CODFIL, "006", "5" ) //RETORNO AGUARDANDO PROCESSAMENTO
+	aIntegra := U_INTPQRY( SM0->M0_CODIGO, SM0->M0_CODFIL, "006", "5", , ,nID ) //RETORNO AGUARDANDO PROCESSAMENTO
 	If Empty(aIntegra)
-		aIntegra := U_INTPQRY( SM0->M0_CODIGO, SM0->M0_CODFIL, "006", "1" ) //PROCESSADO COM SUCESSO
+		aIntegra := U_INTPQRY( SM0->M0_CODIGO, SM0->M0_CODFIL, "006", "1", , ,nID ) //PROCESSADO COM SUCESSO
 	EndIf
 	If ! Empty(aIntegra)
 		For nX := 1 To Len(aIntegra)
 			oXML := XmlParser( aIntegra[nX][15], "_", @cError, @cWarning )
 			If Empty(cError) .OR. Empty(cWarning)
 				SA3->(dbSetOrder(1)) //A3_FILIAL+A3_COD
-				If ( Type("oXML:_VENDEDOR:_ID_RET:Text") == "C" .AND. ! Empty(oXML:_VENDEDOR:_ID_RET:Text) ) .OR. ! Empty(aIntegra[nX][14])
+				If ! Empty(oXML:_VENDEDOR:_ID_RET:Text) .OR. ! Empty(aIntegra[nX][14])
 					If SA3->( dbSeek( xFilial("SA3") + aIntegra[nX][10] ) )
 						RecLock("SA3",.F.)
-							If Type("oXML:_VENDEDOR:_ID_RET:Text") == "C"
-								SA3->A3_XCODEXT := oXML:_VENDEDOR:_ID_RET:Text
+							If ! Empty(oXML:_VENDEDOR:_ID_RET:Text)
+								SA3->A3_XCODEXT := Trim(oXML:_VENDEDOR:_ID_RET:Text)
 							Else
-								SA3->A3_XCODEXT := aIntegra[nX][14]
+								SA3->A3_XCODEXT := Trim(aIntegra[nX][14])
 							EndIf
 						SA3->(MsUnLock())
 
 						cQuery := "UPDATE [INTEGRACAO].[dbo].[XML]" + Chr(13) + Chr(10)
-						cQuery += "   SET [STATUS] = 6" + Chr(13) + Chr(10)
-						cQuery += "WHERE [ID] = " + Str(aIntegra[nX][1],1) + ""
+						cQuery += "   SET [STATUS] = '6'" + Chr(13) + Chr(10)
+						cQuery += "WHERE [ID] = " + lTrim(Str(aIntegra[nX][1])) + ""
 
 						If TCSQLExec(cQuery) < 0
 							ConOut( "TCSQLError() " + TCSQLError() )
 							lRet := .F.
 						Else
 							RecLock("SA3",.F.)
-								SA3->A3_MSEXP := CtoD("")
+								SA3->A3_MSEXP := ""
 							SA3->(MsUnLock())
 
 							lRet := .T.
@@ -159,8 +161,8 @@ If lRetorno
 					cXML += fArToXML(aErro,"ERRO","1.0","UTF-8",@nCount)
 
 					cQuery := "UPDATE [INTEGRACAO].[dbo].[XML]" + Chr(13) + Chr(10)
-					cQuery += "   SET [STATUS] = 7, XML_ERR = '" + cXML + "'" + Chr(13) + Chr(10)
-					cQuery += "WHERE [ID] = " + Str(aIntegra[nX][1],1) + ""
+					cQuery += "   SET [STATUS] = '7', XML_ERR = '" + cXML + "'" + Chr(13) + Chr(10)
+					cQuery += "WHERE [ID] = " + lTrim(Str(aIntegra[nX][1])) + ""
 
 					If TCSQLExec(cQuery) < 0
 						ConOut( "TCSQLError() " + TCSQLError() )
@@ -186,8 +188,8 @@ If lRetorno
 				cXML += fArToXML(aErro,"ERRO","1.0","UTF-8",@nCount)
 
 				cQuery := "UPDATE [INTEGRACAO].[dbo].[XML]" + Chr(13) + Chr(10)
-				cQuery += "   SET [STATUS] = 7, XML_ERR = '" + cXML + "'" + Chr(13) + Chr(10)
-				cQuery += "WHERE [ID] = " + Str(aIntegra[nX][1],1) + ""
+				cQuery += "   SET [STATUS] = '7', XML_ERR = '" + cXML + "'" + Chr(13) + Chr(10)
+				cQuery += "WHERE [ID] = " + lTrim(Str(aIntegra[nX][1])) + ""
 
 				If TCSQLExec(cQuery) < 0
 					ConOut( "TCSQLError() " + TCSQLError() )
@@ -213,8 +215,8 @@ Else
 
 	aAdd(aDados,{"ID_EMP"         ,cEmpAnt})                 //80 - RCC
 	aAdd(aDados,{"ID_FIL"         ,cFilAnt})                 //01 – SP | 02 – CAMPINAS | 03 – PE | 04 – DF | 05 – BA | 06 – RJ
-	aAdd(aDados,{"ID_PROC"        ,"006"})                   //006 – VENDEDOR
-	aAdd(aDados,{"PROCES"         ,"Vendedor"})              //DESCRIÇÃO
+	aAdd(aDados,{"ID_PROC"        ,cIDProc})                 //006 – VENDEDOR
+	aAdd(aDados,{"PROCES"         ,cProces})                 //DESCRIÇÃO
 	aAdd(aDados,{"ID_TRANS"       ,PadR(nAction,1)})         //1 – INCLUIR | 2 – ALTERAR | 3 – EXCLUIR
 	aAdd(aDados,{"TRANSAC"        ,cAction})                 //DESCRIÇÃO
 	aAdd(aDados,{"ID_ORI"         ,'1'})                     //1 - PROTHEUS | 2 - PULSAR | 3 - SCTV | 4 - MÍDIA+
@@ -232,7 +234,7 @@ Else
 	aAdd(aDados,{"PERC_COMIS_CA"  ,SA3->A3_COMIS2})          //PERCENTUAL COMISSAO COM AGENCIA
 	aAdd(aDados,{"FUNCAO"         ,SA3->A3_FUNCAO})          //FUNCAO EXERCIDA (D - DIRETOR | G - GERENTE GERAL | S - SUPERVISOR | R - REPRESENTANTE | V - VENDEDOR)
 	aAdd(aDados,{"TIPO_VENDA"     ,SA3->A3_TIPVEND})         //TIPO DE VENDA (1 - COOPERATIVA | 2 - FUNCIONÁRIO | 3 - CORRETORA)
-	aAdd(aDados,{"BLOQUEADO"      ,SA3->A3_MSBLQL})          //BLOQUEADO (1 - SIM | 2 - NAO)
+//	aAdd(aDados,{"BLOQUEADO"      ,SA3->A3_MSBLQL})          //BLOQUEADO (1 - SIM | 2 - NAO)
 	aAdd(aDados,{"INS_ESTAD"      ,SA3->A3_INSCR})           //INS. ESTAD
 	aAdd(aDados,{"INS_MUNICIP"    ,SA3->A3_INSCRM})          //INS. MUNICIP
 	aAdd(aDados,{"ENDERECO"       ,SA3->A3_END})             //ENDEREÇO
@@ -272,8 +274,8 @@ Else
 	cQuery += "     VALUES" + Chr(13) + Chr(10)
 	cQuery += "           ('" + cEmpAnt + "' " + Chr(13) + Chr(10) //<ID_EMP, nchar(2),>
 	cQuery += "           ,'" + cFilAnt + "' " + Chr(13) + Chr(10) //<ID_FIL, nchar(2),>
-	cQuery += "           ,'" + '001' + "' " + Chr(13) + Chr(10) //<ID_PROC, nchar(3),>
-	cQuery += "           ,'" + 'Cliente' + "' " + Chr(13) + Chr(10) //<PROCES, nchar(10),>
+	cQuery += "           ,'" + cIDProc + "' " + Chr(13) + Chr(10) //<ID_PROC, nchar(3),>
+	cQuery += "           ,'" + cProces + "' " + Chr(13) + Chr(10) //<PROCES, nchar(10),>
 	cQuery += "           ,'" + PadR(nAction,1) + "' " + Chr(13) + Chr(10) //<ID_TRANS, nchar(1),>
 	cQuery += "           ,'" + cAction + "' " + Chr(13) + Chr(10) //<TRANSAC, nchar(10),>
 	cQuery += "           ,'" + '1' + "' " + Chr(13) + Chr(10) //<ID_ORI, nchar(1),>

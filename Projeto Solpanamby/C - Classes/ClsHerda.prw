@@ -18,7 +18,7 @@ Class uExecAuto
 	Data aItemTemp						//Array temporario para o Item
 	Data aTabelas						//Array com as Tabelas que devem ser abertas na Preparacao do Ambiente
 	Data aValues						//Dados para Gravacao
-	
+
 	Data cEmpBkp						//Backup da Empresa Original
 	Data cFilBkp						//Backup da Filial Original
 	Data cEmpGrv						//Empresa para Gravacao
@@ -30,7 +30,7 @@ Class uExecAuto
 	Data dEmissao						//Data da Inclusao ou Alteracao do Registro
 	Data nTime							//Hora Inicio / Fim da Transacao
 	Data cProcTOut						//Processos que estao no Time-Out
-	Data nTimeOut						//Tempo do Time-Out	
+	Data nTimeOut						//Tempo do Time-Out
 
 	Data lExibeTela						//Define se deve exibir Tela com a Mensagem de Erro
 	Data lGravaLog						//Define se deve gravar arquivo de log com a Mensagem de Erro
@@ -80,7 +80,7 @@ Return Self
  Metodo........: 	AddValues
  Descricao.....: 	Armazena os valores para gravacao
  Parametros....:	cCampo - Nome do Campo para Gravacao
- 					xValor - Valor do Campo para Gravacao 
+ 					xValor - Valor do Campo para Gravacao
 ==========================================================================*/
 Method AddValues(cCampo, xValor) Class uExecAuto
 	Local nPosCpo	:= Ascan(::aValues, {|x| AllTrim(x[01]) == AllTrim(cCampo)})
@@ -104,7 +104,7 @@ Return Nil
  Metodo........: 	AddCabec
  Descricao.....: 	Armazena os Valores do Cabecalho do para gravacao.
  Parametros....:	cCampo - Nome do Campo para Gravacao
- 					xValor - Valor do Campo para Gravacao 
+ 					xValor - Valor do Campo para Gravacao
 ==========================================================================*/
 Method AddCabec(cCampo, xValor) Class uExecAuto
 	Local nPosCpo := Ascan(::aCabec, {|x| x[01] == cCampo})		//Posicao do Campo no Array
@@ -128,7 +128,7 @@ Return Nil
  Metodo........: 	AddItem
  Descricao.....: 	Armazena os Valores do Item para gravacao.
  Parametros....:	cCampo - Nome do Campo para Gravacao
- 					xValor - Valor do Campo para Gravacao 
+ 					xValor - Valor do Campo para Gravacao
 ==========================================================================*/
 Method AddItem(cCampo, xValor) Class uExecAuto
 	Local nPosCpo := Ascan(::aItemTemp, {|x| x[01] == cCampo})
@@ -146,7 +146,7 @@ Return Nil
  Metodo........: 	SetItem
  Descricao.....: 	Armazena os Valores do Item e Reinicializa o Array Temporario.
  Parametros....:	cCampo - Nome do Campo para Gravacao
- 					xValor - Valor do Campo para Gravacao 
+ 					xValor - Valor do Campo para Gravacao
 ==========================================================================*/
 Method SetItem() Class uExecAuto
 	If Len(::aItemTemp) > 0
@@ -158,14 +158,14 @@ Return Nil
 /*==========================================================================
  Metodo.......: SetEnv
  Descricao....: Prepara o Ambiente para Gravacao na Empresa correta.
- Parametros...: nOpcao -> 1 = Prepara / 2 = Restaura 
+ Parametros...: nOpcao -> 1 = Prepara / 2 = Restaura
 ==========================================================================*/
 Method SetEnv(nOpcao, cModulo, lTroca) Class uExecAuto
 	Local	nTamEmp		:= Len(::cEmpGrv)
 
 	Default cModulo 	:= "FAT"
 	Default lTroca		:= .F.
-	
+
 	If nTamEmp > 2
 		::cEmpGrv := Substr(::cEmpGrv, 1, 2)
 	EndIf
@@ -174,17 +174,16 @@ Method SetEnv(nOpcao, cModulo, lTroca) Class uExecAuto
 		If !Empty(::cEmpGrv) .AND. !Empty(::cFilGrv)
 			::cEmpBkp := cEmpAnt
 			::cFilBkp := cFilAnt
-			
+
 			If (::cEmpGrv <> ::cEmpBkp .OR. ::cFilGrv <> ::cFilBkp) .Or. lTroca
 				RpcClearEnv()
 				RPCSetType(3)
 				RpcSetEnv(::cEmpGrv, ::cFilGrv, NIL, NIL, cModulo, NIL, ::aTabelas)
 			EndIf
 		EndIf
-	
+
 		::lExibeTela	:= SuperGetMV("SP_SHOWERR", NIL, .F.)
 		::lGravaLog		:= SuperGetMV("SP_GRVLOG", NIL, .T.)
-
 	Else
 		If !Empty(::cEmpBkp) .AND. !Empty(::cFilBkp)
 			If ::cEmpBkp <> cEmpAnt .OR. ::cFilBkp <> cFilAnt
@@ -194,7 +193,6 @@ Method SetEnv(nOpcao, cModulo, lTroca) Class uExecAuto
 			EndIf
 		EndIf
 	EndIf
-
 Return Nil
 
 /*==========================================================================

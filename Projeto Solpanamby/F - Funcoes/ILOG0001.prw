@@ -10,6 +10,7 @@
 User Function ILOG0001()
 Local aArea := GetArea()
 Local lRetorno := .T.
+
 Private lBtnFil := .F.
 
 While lRetorno
@@ -36,17 +37,18 @@ Local aRet := {}
 Local aParamBox := {}
 Local lRetorno := .T.
 
-Private cTitulo := "Monitor de Logs de Integração Protheus" + If(SM0->M0_CODIGO == "80", " vs Pulsar","")
+Private cTitulo := "Monitor de Logs de Integração Protheus" + If(SM0->M0_CODIGO == "80", " vs Pulsar",If(SM0->M0_CODIGO == "75", " vs SCTV",""))
 Private cCadastro := cTitulo
 
 aAdd( aParamBox, { 1,"Data de Integração De"	,dDatabase,"","","","",0,.T. } )
 aAdd( aParamBox, { 1,"Data de Integração Até"	,dDatabase,"","","","",0,.T. } )
 
-aAdd( aParamBox, { 5,"Cliente"				,.T.,100,"",.F. } )
-aAdd( aParamBox, { 5,"Faturamento"			,.T.,100,"",.F. } )
-aAdd( aParamBox, { 5,"Pedido de Venda"		,.T.,100,"",.F. } )
-aAdd( aParamBox, { 5,"Nota Fsical"			,.T.,100,"",.F. } )
-aAdd( aParamBox, { 5,"Título Financeiro"	,.T.,100,"",.F. } )
+aAdd( aParamBox, { 5,"Cliente"			,.T.,100,"",.F. } )
+aAdd( aParamBox, { 5,"Faturamento"		,.T.,100,"",.F. } )
+aAdd( aParamBox, { 5,"Pedido de Venda"	,.T.,100,"",.F. } )
+aAdd( aParamBox, { 5,"Nota Fsical"		,.T.,100,"",.F. } )
+aAdd( aParamBox, { 5,"Título Financeiro",.T.,100,"",.F. } )
+aAdd( aParamBox, { 5,"Vendedor"			,.T.,100,"",.F. } )
 
 If ParamBox( aParamBox,"",@aRet, { ||VldPar( aRet ) } )
 	Monitor( aRet )
@@ -79,18 +81,17 @@ Return(lRetorno)
 @type			Function
 /*/
 Static Function Monitor( aParam )
-Local oFontLeg := TFont():New("Verdana",,012,,.T.,,,,,.F.,.F.)
-Local oFontPan := TFont():New("Verdana",,012,,.T.,,,,,.F.,.F.)
-Local bCarga := { || FwMsgRun( ,{|| RefBrowse( @aLbxLog, @oLbxLog, dDataDe, dDataAte, aFiltro ) }, , 'Atualizando dados, Por favor aguarde' ) }
-Local bReproc := { || FwMsgRun( ,{|| U_ISCH0002( .F., Left(aLbxLog[oLbxLog:nAt,03],3) ) }, , 'Reprocessando dados, Por favor aguarde' ) }
-Local aSize := MsAdvSize( .F. )
-Local dDataDe := aParam[1]
-Local dDataAte := aParam[2]
-Local aFiltro := {}
-Local aLbxLog := {}
-Local oLbxLog := Nil
-Local oDlg := Nil
-
+Local oFontLeg	:= TFont():New("Verdana",,012,,.T.,,,,,.F.,.F.)
+Local oFontPan 	:= TFont():New("Verdana",,012,,.T.,,,,,.F.,.F.)
+Local bCarga 	:= { || FwMsgRun( ,{|| RefBrowse( @aLbxLog, @oLbxLog, dDataDe, dDataAte, aFiltro ) }, , 'Atualizando dados, Por favor aguarde' ) }
+Local bReproc 	:= { || FwMsgRun( ,{|| U_ISCH0002( .F., Left(aLbxLog[oLbxLog:nAt,03],3), aLbxLog[oLbxLog:nAt,02] ) }, , 'Reprocessando dados, Por favor aguarde' ) }
+Local aSize 	:= MsAdvSize( .F. )
+Local dDataDe 	:= aParam[1]
+Local dDataAte 	:= aParam[2]
+Local aFiltro 	:= {}
+Local aLbxLog 	:= {}
+Local oLbxLog 	:= Nil
+Local oDlg 		:= Nil
 Local oFWLayer
 Local oWin1
 Local oWin2
@@ -110,6 +111,9 @@ If aParam[06]	//Nota Fiscal
 EndIf
 If aParam[07]	//Título Finenceiro (PARCELA)
 	aAdd( aFiltro, "005" )
+EndIf
+If aParam[07]	//Vendedor
+	aAdd( aFiltro, "006" )
 EndIf
 
 DEFINE MSDIALOG oDlg TITLE cTitulo FROM aSize[7],aSize[1] TO aSize[6],aSize[5] OF oMainWnd STYLE nOR( WS_VISIBLE,WS_POPUP ) PIXEL
@@ -198,7 +202,7 @@ Local nY := 0
 
 //Chama funcao de retorno de Query
 For nX := 1 To Len( aFiltro )
-	aRetAux := U_INTPQRY( cEmpAnt, cFilAnt, aFiltro[nX], Nil, dDataDe, dDataAte )
+	aRetAux := U_INTPQRY( cEmpAnt, cFilAnt, aFiltro[nX], Nil, dDataDe, dDataAte, Nil )
 
 	If Len( aRetAux ) > 0
 		lVazio := .F.
@@ -232,6 +236,8 @@ For nX := 1 To Len( aFiltro )
 				cProces := "004 - Nota Fiscal"
 			ElseIf Alltrim( aRetAux[nY][04] ) == "005"
 				cProces := "005 - Título Financeiro"
+			ElseIf Alltrim( aRetAux[nY][04] ) == "006"
+				cProces := "006 - Vendedor"
 			EndIf
 
 			//Transacao
@@ -294,6 +300,7 @@ For nX := 1 To Len( aFiltro )
 							})
 		Next( nY )
 	EndIf
+
 Next( nX )
 
 If lVazio
@@ -326,28 +333,30 @@ Return(Nil)
 @type			Function
 /*/
 Static Function VisLog( oLbxLog )
-Local cMEnvio := oLbxLog:aArray[ oLbxLog:nAT ][ 13 ]
-Local cMRet := oLbxLog:aArray[ oLbxLog:nAT ][ 14 ]
-Local cMErro := oLbxLog:aArray[ oLbxLog:nAT ][ 15 ]
-Local oBtnSair := Nil
-Local oPanelBot := Nil
-Local oDlgVis := Nil
+Local cMEnvio	:= oLbxLog:aArray[ oLbxLog:nAT ][ 13 ]
+Local cMRet 	:= oLbxLog:aArray[ oLbxLog:nAT ][ 14 ]
+Local cMErro 	:= oLbxLog:aArray[ oLbxLog:nAT ][ 15 ]
+Local oBtnSair 	:= Nil
+Local oPanelBot	:= Nil
+Local oDlgVis 	:= Nil
 
 DEFINE MSDIALOG oDlgVis TITLE "LOG - Visualização" FROM 000, 000 TO 400, 800 COLORS 0, 16777215 PIXEL
-	//Grupos
-	@ 005, 002 GROUP oGrpEnv	TO 175, 132 PROMPT " XML Envio "	OF oDlgVis COLOR 0, 16777215 PIXEL
-	@ 005, 135 GROUP oGrpRet	TO 175, 265 PROMPT " XML Retorno "	OF oDlgVis COLOR 0, 16777215 PIXEL
-	@ 005, 268 GROUP oGrpErro	TO 175, 398 PROMPT " XML Erro "		OF oDlgVis COLOR 0, 16777215 PIXEL
 
-	@ 015, 007 GET oMEnvio	VAR cMEnvio	OF oDlgVis MULTILINE SIZE 120, 155 COLORS 0, 16777215 HSCROLL READONLY PIXEL
-	@ 015, 140 GET oMRet	VAR cMRet	OF oDlgVis MULTILINE SIZE 120, 155 COLORS 0, 16777215 HSCROLL READONLY PIXEL
-	@ 015, 272 GET oMErro	VAR cMErro	OF oDlgVis MULTILINE SIZE 120, 155 COLORS 0, 16777215 HSCROLL READONLY PIXEL
+//Grupos
+@ 005, 002 GROUP oGrpEnv	TO 175, 132 PROMPT " XML Envio "	OF oDlgVis COLOR 0, 16777215 PIXEL
+@ 005, 135 GROUP oGrpRet	TO 175, 265 PROMPT " XML Retorno "	OF oDlgVis COLOR 0, 16777215 PIXEL
+@ 005, 268 GROUP oGrpErro	TO 175, 398 PROMPT " XML Erro "		OF oDlgVis COLOR 0, 16777215 PIXEL
 
-	@ 180, 000 MSPANEL oPanelBot SIZE 400, 020 OF oDlgVis COLORS 0, 16777215 RAISED
-	oPanelBot:Align := CONTROL_ALIGN_BOTTOM
+@ 015, 007 GET oMEnvio	VAR cMEnvio	OF oDlgVis MULTILINE SIZE 120, 155 COLORS 0, 16777215 HSCROLL READONLY PIXEL
+@ 015, 140 GET oMRet	VAR cMRet	OF oDlgVis MULTILINE SIZE 120, 155 COLORS 0, 16777215 HSCROLL READONLY PIXEL
+@ 015, 272 GET oMErro	VAR cMErro	OF oDlgVis MULTILINE SIZE 120, 155 COLORS 0, 16777215 HSCROLL READONLY PIXEL
 
-	@ 001, 001 BTNBMP oBtnSair RESNAME "FINAL" SIZE 050, 038 OF oPanelBot MESSAGE "Sair"
-	oBtnSair:Align := CONTROL_ALIGN_LEFT
-	oBtnSair:bAction := { || oDlgVis:End() }
+@ 180, 000 MSPANEL oPanelBot SIZE 400, 020 OF oDlgVis COLORS 0, 16777215 RAISED
+oPanelBot:Align 	:= CONTROL_ALIGN_BOTTOM
+
+@ 001, 001 BTNBMP oBtnSair RESNAME "FINAL" SIZE 050, 038 OF oPanelBot MESSAGE "Sair"
+oBtnSair:Align		:= CONTROL_ALIGN_LEFT
+oBtnSair:bAction	:= { || oDlgVis:End() }
+
 ACTIVATE MSDIALOG oDlgVis CENTERED
 Return(Nil)

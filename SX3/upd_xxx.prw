@@ -17,7 +17,7 @@
 ±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±
 ßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßß
 */
-User Function UPD_SA1( cEmpAmb, cFilAmb )
+User Function UPD_XXX( cEmpAmb, cFilAmb )
 
 Local   aSay      := {}
 Local   aButton   := {}
@@ -343,6 +343,11 @@ aEstrut := { "X3_ARQUIVO", "X3_ORDEM"  , "X3_CAMPO"  , "X3_TIPO"   , "X3_TAMANHO
              "X3_CONTEXT", "X3_OBRIGAT", "X3_VLDUSER", "X3_CBOX"   , "X3_CBOXSPA", "X3_CBOXENG", ;
              "X3_PICTVAR", "X3_WHEN"   , "X3_INIBRW" , "X3_GRPSXG" , "X3_FOLDER" , "X3_PYME"   }
 
+//	Chr(128) + Chr(128) + Chr(128) + Chr(128) + Chr(128) + ;
+//	Chr(128) + Chr(128) + Chr(128) + Chr(128) + Chr(128) + ;
+//	Chr(128) + Chr(128) + Chr(128) + Chr(128) + Chr(128)					, ; //X3_USADO
+//	'V'																		, ; //X3_VISUAL
+/*
 //
 // Tabela SA1
 //
@@ -359,6 +364,221 @@ aAdd( aSX3, { ;
 	'Cod Cliente Externo'													, ; //X3_DESCRIC
 	'Cod Cliente Externo'													, ; //X3_DESCSPA
 	'Cod Cliente Externo'													, ; //X3_DESCENG
+	'@!'																	, ; //X3_PICTURE
+	''																		, ; //X3_VALID
+	Chr(128) + Chr(128) + Chr(128) + Chr(128) + Chr(128) + ;
+	Chr(128) + Chr(128) + Chr(128) + Chr(128) + Chr(128) + ;
+	Chr(128) + Chr(128) + Chr(128) + Chr(128) + Chr(160)					, ; //X3_USADO
+	''																		, ; //X3_RELACAO
+	''																		, ; //X3_F3
+	0																		, ; //X3_NIVEL
+	Chr(254) + Chr(192)														, ; //X3_RESERV
+	''																		, ; //X3_CHECK
+	''																		, ; //X3_TRIGGER
+	'U'																		, ; //X3_PROPRI
+	'N'																		, ; //X3_BROWSE
+	'A'																		, ; //X3_VISUAL
+	'R'																		, ; //X3_CONTEXT
+	''																		, ; //X3_OBRIGAT
+	''																		, ; //X3_VLDUSER
+	''																		, ; //X3_CBOX
+	''																		, ; //X3_CBOXSPA
+	''																		, ; //X3_CBOXENG
+	''																		, ; //X3_PICTVAR
+	''																		, ; //X3_WHEN
+	''																		, ; //X3_INIBRW
+	''																		, ; //X3_GRPSXG
+	''																		, ; //X3_FOLDER
+	''																		} ) //X3_PYME
+
+//
+// Tabela SA2
+//
+aAdd( aSX3, { ;
+	'SA2'																	, ; //X3_ARQUIVO
+	'ZZ'																	, ; //X3_ORDEM
+	'A2_XCODEXT'															, ; //X3_CAMPO
+	'C'																		, ; //X3_TIPO
+	10																		, ; //X3_TAMANHO
+	0																		, ; //X3_DECIMAL
+	'Cod Externo'															, ; //X3_TITULO
+	'Cod Externo'															, ; //X3_TITSPA
+	'Cod Externo'															, ; //X3_TITENG
+	'Cod Fornecedor Externo'												, ; //X3_DESCRIC
+	'Cod Fornecedor Externo'												, ; //X3_DESCSPA
+	'Cod Fornecedor Externo'												, ; //X3_DESCENG
+	'@!'																	, ; //X3_PICTURE
+	''																		, ; //X3_VALID
+	Chr(128) + Chr(128) + Chr(128) + Chr(128) + Chr(128) + ;
+	Chr(128) + Chr(128) + Chr(128) + Chr(128) + Chr(128) + ;
+	Chr(128) + Chr(128) + Chr(128) + Chr(128) + Chr(160)					, ; //X3_USADO
+	''																		, ; //X3_RELACAO
+	''																		, ; //X3_F3
+	0																		, ; //X3_NIVEL
+	Chr(254) + Chr(192)														, ; //X3_RESERV
+	''																		, ; //X3_CHECK
+	''																		, ; //X3_TRIGGER
+	'U'																		, ; //X3_PROPRI
+	'N'																		, ; //X3_BROWSE
+	'A'																		, ; //X3_VISUAL
+	'R'																		, ; //X3_CONTEXT
+	''																		, ; //X3_OBRIGAT
+	''																		, ; //X3_VLDUSER
+	''																		, ; //X3_CBOX
+	''																		, ; //X3_CBOXSPA
+	''																		, ; //X3_CBOXENG
+	''																		, ; //X3_PICTVAR
+	''																		, ; //X3_WHEN
+	''																		, ; //X3_INIBRW
+	''																		, ; //X3_GRPSXG
+	''																		, ; //X3_FOLDER
+	''																		} ) //X3_PYME
+
+//
+// Tabela SA3
+//
+aAdd( aSX3, { ;
+	'SA3'																	, ; //X3_ARQUIVO
+	'ZZ'																	, ; //X3_ORDEM
+	'A3_XCODEXT'															, ; //X3_CAMPO
+	'C'																		, ; //X3_TIPO
+	10																		, ; //X3_TAMANHO
+	0																		, ; //X3_DECIMAL
+	'Cod Externo'															, ; //X3_TITULO
+	'Cod Externo'															, ; //X3_TITSPA
+	'Cod Externo'															, ; //X3_TITENG
+	'Cod Vendedor Externo'													, ; //X3_DESCRIC
+	'Cod Vendedor Externo'													, ; //X3_DESCSPA
+	'Cod Vendedor Externo'													, ; //X3_DESCENG
+	'@!'																	, ; //X3_PICTURE
+	''																		, ; //X3_VALID
+	Chr(128) + Chr(128) + Chr(128) + Chr(128) + Chr(128) + ;
+	Chr(128) + Chr(128) + Chr(128) + Chr(128) + Chr(128) + ;
+	Chr(128) + Chr(128) + Chr(128) + Chr(128) + Chr(160)					, ; //X3_USADO
+	''																		, ; //X3_RELACAO
+	''																		, ; //X3_F3
+	0																		, ; //X3_NIVEL
+	Chr(254) + Chr(192)														, ; //X3_RESERV
+	''																		, ; //X3_CHECK
+	''																		, ; //X3_TRIGGER
+	'U'																		, ; //X3_PROPRI
+	'N'																		, ; //X3_BROWSE
+	'A'																		, ; //X3_VISUAL
+	'R'																		, ; //X3_CONTEXT
+	''																		, ; //X3_OBRIGAT
+	''																		, ; //X3_VLDUSER
+	''																		, ; //X3_CBOX
+	''																		, ; //X3_CBOXSPA
+	''																		, ; //X3_CBOXENG
+	''																		, ; //X3_PICTVAR
+	''																		, ; //X3_WHEN
+	''																		, ; //X3_INIBRW
+	''																		, ; //X3_GRPSXG
+	''																		, ; //X3_FOLDER
+	''																		} ) //X3_PYME
+
+//
+// Tabela SC5
+//
+aAdd( aSX3, { ;
+	'SC5'																	, ; //X3_ARQUIVO
+	'ZZ'																	, ; //X3_ORDEM
+	'C5_XCODEXT'															, ; //X3_CAMPO
+	'C'																		, ; //X3_TIPO
+	10																		, ; //X3_TAMANHO
+	0																		, ; //X3_DECIMAL
+	'Cod Externo'															, ; //X3_TITULO
+	'Cod Externo'															, ; //X3_TITSPA
+	'Cod Externo'															, ; //X3_TITENG
+	'Cod Vendedor Externo'													, ; //X3_DESCRIC
+	'Cod Vendedor Externo'													, ; //X3_DESCSPA
+	'Cod Vendedor Externo'													, ; //X3_DESCENG
+	'@!'																	, ; //X3_PICTURE
+	''																		, ; //X3_VALID
+	Chr(128) + Chr(128) + Chr(128) + Chr(128) + Chr(128) + ;
+	Chr(128) + Chr(128) + Chr(128) + Chr(128) + Chr(128) + ;
+	Chr(128) + Chr(128) + Chr(128) + Chr(128) + Chr(160)					, ; //X3_USADO
+	''																		, ; //X3_RELACAO
+	''																		, ; //X3_F3
+	0																		, ; //X3_NIVEL
+	Chr(254) + Chr(192)														, ; //X3_RESERV
+	''																		, ; //X3_CHECK
+	''																		, ; //X3_TRIGGER
+	'U'																		, ; //X3_PROPRI
+	'N'																		, ; //X3_BROWSE
+	'A'																		, ; //X3_VISUAL
+	'R'																		, ; //X3_CONTEXT
+	''																		, ; //X3_OBRIGAT
+	''																		, ; //X3_VLDUSER
+	''																		, ; //X3_CBOX
+	''																		, ; //X3_CBOXSPA
+	''																		, ; //X3_CBOXENG
+	''																		, ; //X3_PICTVAR
+	''																		, ; //X3_WHEN
+	''																		, ; //X3_INIBRW
+	''																		, ; //X3_GRPSXG
+	''																		, ; //X3_FOLDER
+	''																		} ) //X3_PYME
+
+//
+// Tabela SE1
+//
+aAdd( aSX3, { ;
+	'SE1'																	, ; //X3_ARQUIVO
+	'ZZ'																	, ; //X3_ORDEM
+	'E1_XCODEXT'															, ; //X3_CAMPO
+	'C'																		, ; //X3_TIPO
+	10																		, ; //X3_TAMANHO
+	0																		, ; //X3_DECIMAL
+	'Cod Externo'															, ; //X3_TITULO
+	'Cod Externo'															, ; //X3_TITSPA
+	'Cod Externo'															, ; //X3_TITENG
+	'Cod Vendedor Externo'													, ; //X3_DESCRIC
+	'Cod Vendedor Externo'													, ; //X3_DESCSPA
+	'Cod Vendedor Externo'													, ; //X3_DESCENG
+	'@!'																	, ; //X3_PICTURE
+	''																		, ; //X3_VALID
+	Chr(128) + Chr(128) + Chr(128) + Chr(128) + Chr(128) + ;
+	Chr(128) + Chr(128) + Chr(128) + Chr(128) + Chr(128) + ;
+	Chr(128) + Chr(128) + Chr(128) + Chr(128) + Chr(160)					, ; //X3_USADO
+	''																		, ; //X3_RELACAO
+	''																		, ; //X3_F3
+	0																		, ; //X3_NIVEL
+	Chr(254) + Chr(192)														, ; //X3_RESERV
+	''																		, ; //X3_CHECK
+	''																		, ; //X3_TRIGGER
+	'U'																		, ; //X3_PROPRI
+	'N'																		, ; //X3_BROWSE
+	'A'																		, ; //X3_VISUAL
+	'R'																		, ; //X3_CONTEXT
+	''																		, ; //X3_OBRIGAT
+	''																		, ; //X3_VLDUSER
+	''																		, ; //X3_CBOX
+	''																		, ; //X3_CBOXSPA
+	''																		, ; //X3_CBOXENG
+	''																		, ; //X3_PICTVAR
+	''																		, ; //X3_WHEN
+	''																		, ; //X3_INIBRW
+	''																		, ; //X3_GRPSXG
+	''																		, ; //X3_FOLDER
+	''																		} ) //X3_PYME
+*/
+//
+// Tabela SF2
+//
+aAdd( aSX3, { ;
+	'SF2'																	, ; //X3_ARQUIVO
+	'ZZ'																	, ; //X3_ORDEM
+	'F2_XCODEXT'															, ; //X3_CAMPO
+	'C'																		, ; //X3_TIPO
+	10																		, ; //X3_TAMANHO
+	0																		, ; //X3_DECIMAL
+	'Cod Externo'															, ; //X3_TITULO
+	'Cod Externo'															, ; //X3_TITSPA
+	'Cod Externo'															, ; //X3_TITENG
+	'Cod Vendedor Externo'													, ; //X3_DESCRIC
+	'Cod Vendedor Externo'													, ; //X3_DESCSPA
+	'Cod Vendedor Externo'													, ; //X3_DESCENG
 	'@!'																	, ; //X3_PICTURE
 	''																		, ; //X3_VALID
 	Chr(128) + Chr(128) + Chr(128) + Chr(128) + Chr(128) + ;

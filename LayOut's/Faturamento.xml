@@ -19,9 +19,33 @@
 	<VIG_INI></VIG_INI>	<!-- Início de veiculação -->
 	<VIG_FIM></VIG_FIM>	<!-- Término de veiculação -->
 	<TOT_INS></TOT_INS>
+	<ITENS>
+		<ITEM>
+			<SEQ></SEQ>
+			<ID_PROD></ID_PROD>
+			<DESCRICAO></DESCRICAO>
+			<QTDE></QTDE>
+			<VLR_UNIT></VLR_UNIT>
+			<DESCONTO></DESCONTO>
+			<VLR_BRUTO></VLR_BRUTO>
+			<VLR_LIQUI></VLR_LIQUI>
+		</ITEM>
+	</ITENS>
 	<NOTAS_FICAIS>
 		<NOTA_FICAL>
 			<ID_NF></ID_NF>	<!-- CODIGO DA NOTA FISCAL (PULSAR) -->
+			<ITENS>
+				<ITEM>
+					<SEQ></SEQ>
+					<ID_PROD></ID_PROD>
+					<DESCRICAO></DESCRICAO>
+					<QTDE></QTDE>
+					<VLR_UNIT></VLR_UNIT>
+					<DESCONTO></DESCONTO>
+					<VLR_BRUTO></VLR_BRUTO>
+					<VLR_LIQUI></VLR_LIQUI>
+				</ITEM>
+			</ITENS>
 			<PARCELAS>
 				<PARCELA>
 					<ID_TIT></ID_TIT>		<!-- CODIGO DO TITULO/PARCELA CADASTRADO (PULSAR) -->

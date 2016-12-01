@@ -18,6 +18,7 @@ ID_PROC	- 001 - Clientes
 		- 003 – Pedido de Venda
 		- 004 – Nota Fiscal
 		- 005 – Título Finenceiro (PARCELA)
+		- 006 - Vendedores
 
 ID_TRANS- 1 - Incluir
 		- 2 - Alterar
@@ -64,11 +65,10 @@ STATUS	- 0 - AGUARDANDO PROCESSAMENTO
 ±±ÌÍÍÍÍÍÍÍÍÍÍÍÍØÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍ¹±±
 ±±º Uso        ³ Integracao do cadastro de clientes                             º±±
 ±±ÌÍÍÍÍÍÍÍÍÍÍÍÍØÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍ¹±±
-±±º Parametros ³ INCLUI - L Indica inclusão                                     º±±
-±±º            ³ ALTERA - L Indica alteração                                    º±±
-±±º            ³ RETORNO - L Indica retorno                                     º±±
+±±º Parametros ³ INCLUI - L - Inclusão                                          º±±
+±±º            ³ ALTERA - L - Alteração                                         º±±
 ±±ÌÍÍÍÍÍÍÍÍÍÍÍÍØÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍ¹±±
-±±º Retorno    ³ Nil                                                            º±±
+±±º Retorno    ³ lRet - L - .T. OK / .F. Erro                                   º±±
 ±±ÌÍÍÍÍÍÍÍÍÍÍÍÍØÍÍÍÍÍÍÍÍÍÍÍÍÍÑÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍ¹±±
 ±±º Data       ³ Analista    ³Descricao da Alteracao                            º±±
 ±±º============³=============³==================================================º±±
@@ -77,13 +77,15 @@ STATUS	- 0 - AGUARDANDO PROCESSAMENTO
 ±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±
 ÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜ
 */
-User Function ISA10001(lInclui,lAltera,lRetorno) //U_ISA10001(.F.,.F.,.T.)
+User Function ISA10001(lInclui,lAltera,lRetorno,nID) //U_ISA10001(.F.,.F.,.T.)
 Local aCliente := {}
 Local aContatos := {}
 Local aIntegra := {}
 Local cAction := ""
 Local cDestino := ""
 Local cError := ""
+Local IDProc := "001"
+Local Proces := "Cliente"
 Local cQuery := ""
 Local cRetorno := ""
 Local cWarning := ""
@@ -97,6 +99,7 @@ Private nCount := 0
 Default lInclui := .F.
 Default lAltera := .F.
 Default lRetorno := .F.
+Default nID := 0
 
 If SM0->M0_CODIGO == "70" //TVB CAMPINAS
 	cDestino := "4"
@@ -107,35 +110,35 @@ ElseIf SM0->M0_CODIGO == "80" //NOVA BRASIL FM
 EndIf
 
 If lRetorno
-	aIntegra := U_INTPQRY( SM0->M0_CODIGO, SM0->M0_CODFIL, "001", "5" ) //RETORNO AGUARDANDO PROCESSAMENTO
+	aIntegra := U_INTPQRY( SM0->M0_CODIGO, SM0->M0_CODFIL, "001", "5", , ,nID ) //RETORNO AGUARDANDO PROCESSAMENTO
 	If Empty(aIntegra)
-		aIntegra := U_INTPQRY( SM0->M0_CODIGO, SM0->M0_CODFIL, "001", "1" ) //PROCESSADO COM SUCESSO
+		aIntegra := U_INTPQRY( SM0->M0_CODIGO, SM0->M0_CODFIL, "001", "1", , ,nID ) //PROCESSADO COM SUCESSO
 	EndIf
 	If ! Empty(aIntegra)
 		For nX := 1 To Len(aIntegra)
 			oXML := XmlParser( aIntegra[nX][15], "_", @cError, @cWarning )
 			If Empty(cError) .OR. Empty(cWarning)
 				SA1->(dbSetOrder(1)) //A1_FILIAL+A1_COD+A1_LOJA
-				If ( Type("oXML:_CLIENTE:_ID_RET:Text") == "C" .AND. ! Empty(oXML:_CLIENTE:_ID_RET:Text) ) .OR. ! Empty(aIntegra[nX][14])
+				If ! Empty(oXML:_CLIENTE:_ID_RET:Text) .OR. ! Empty(aIntegra[nX][14])
 					If SA1->( dbSeek( xFilial("SA1") + aIntegra[nX][10] ) )
 						RecLock("SA1",.F.)
-							If Type("oXML:_CLIENTE:_ID_RET:Text") == "C"
-								SA1->A1_XCODEXT := oXML:_CLIENTE:_ID_RET:Text
+							If ! Empty(oXML:_CLIENTE:_ID_RET:Text)
+								SA1->A1_XCODEXT := Trim(oXML:_CLIENTE:_ID_RET:Text)
 							Else
-								SA1->A1_XCODEXT := aIntegra[nX][14]
+								SA1->A1_XCODEXT := Trim(aIntegra[nX][14])
 							EndIf
 						SA1->(MsUnLock())
 
 						cQuery := "UPDATE [INTEGRACAO].[dbo].[XML]" + Chr(13) + Chr(10)
-						cQuery += "   SET [STATUS] = 6" + Chr(13) + Chr(10)
-						cQuery += "WHERE [ID] = " + Str(aIntegra[nX][1],1) + ""
+						cQuery += "   SET [STATUS] = '6'" + Chr(13) + Chr(10)
+						cQuery += "WHERE [ID] = " + lTrim(Str(aIntegra[nX][1])) + ""
 
 						If TCSQLExec(cQuery) < 0
 							ConOut( "TCSQLError() " + TCSQLError() )
 							lRet := .F.
 						Else
 							RecLock("SA1",.F.)
-								SA1->A1_MSEXP := CtoD("")
+								SA1->A1_MSEXP := ""
 							SA1->(MsUnLock())
 
 							lRet := .T.
@@ -159,8 +162,8 @@ If lRetorno
 					cXML += fArToXML(aErro,"ERRO","1.0","UTF-8",@nCount)
 
 					cQuery := "UPDATE [INTEGRACAO].[dbo].[XML]" + Chr(13) + Chr(10)
-					cQuery += "   SET [STATUS] = 7, XML_ERR = '" + cXML + "'" + Chr(13) + Chr(10)
-					cQuery += "WHERE [ID] = " + Str(aIntegra[nX][1],1) + ""
+					cQuery += "   SET [STATUS] = '7', XML_ERR = '" + cXML + "'" + Chr(13) + Chr(10)
+					cQuery += "WHERE [ID] = " + lTrim(Str(aIntegra[nX][1])) + ""
 
 					If TCSQLExec(cQuery) < 0
 						ConOut( "TCSQLError() " + TCSQLError() )
@@ -186,8 +189,8 @@ If lRetorno
 				cXML += fArToXML(aErro,"ERRO","1.0","UTF-8",@nCount)
 
 				cQuery := "UPDATE [INTEGRACAO].[dbo].[XML]" + Chr(13) + Chr(10)
-				cQuery += "   SET [STATUS] = 7, XML_ERR = '" + cXML + "'" + Chr(13) + Chr(10)
-				cQuery += "WHERE [ID] = " + Str(aIntegra[nX][1],1) + ""
+				cQuery += "   SET [STATUS] = '7', XML_ERR = '" + cXML + "'" + Chr(13) + Chr(10)
+				cQuery += "WHERE [ID] = " + lTrim(Str(aIntegra[nX][1])) + ""
 
 				If TCSQLExec(cQuery) < 0
 					ConOut( "TCSQLError() " + TCSQLError() )
@@ -213,8 +216,8 @@ Else
 
 	aAdd(aCliente,{"ID_EMP"         ,cEmpAnt})                 //80 - RCC
 	aAdd(aCliente,{"ID_FIL"         ,cFilAnt})                 //01 – SP | 02 – CAMPINAS | 03 – PE | 04 – DF | 05 – BA | 06 – RJ
-	aAdd(aCliente,{"ID_PROC"        ,"001"})                   //001 – CLIENTE
-	aAdd(aCliente,{"PROCES"         ,"Cliente"})               //DESCRIÇÃO
+	aAdd(aCliente,{"ID_PROC"        ,cIDProc})                 //001 – CLIENTE
+	aAdd(aCliente,{"PROCES"         ,cProces})                 //DESCRIÇÃO
 	aAdd(aCliente,{"ID_TRANS"       ,PadR(nAction,1)})         //1 – INCLUIR | 2 – ALTERAR | 3 – EXCLUIR
 	aAdd(aCliente,{"TRANSAC"        ,cAction})                 //DESCRIÇÃO
 	aAdd(aCliente,{"ID_ORI"         ,'1'})                     //1 - PROTHEUS | 2 - PULSAR | 3 - SCTV | 4 - MÍDIA+
@@ -315,8 +318,8 @@ Else
 	cQuery += "     VALUES" + Chr(13) + Chr(10)
 	cQuery += "           ('" + cEmpAnt + "' " + Chr(13) + Chr(10) //<ID_EMP, nchar(2),>
 	cQuery += "           ,'" + cFilAnt + "' " + Chr(13) + Chr(10) //<ID_FIL, nchar(2),>
-	cQuery += "           ,'" + '001' + "' " + Chr(13) + Chr(10) //<ID_PROC, nchar(3),>
-	cQuery += "           ,'" + 'Cliente' + "' " + Chr(13) + Chr(10) //<PROCES, nchar(10),>
+	cQuery += "           ,'" + cIDProc + "' " + Chr(13) + Chr(10) //<ID_PROC, nchar(3),>
+	cQuery += "           ,'" + cProces + "' " + Chr(13) + Chr(10) //<PROCES, nchar(10),>
 	cQuery += "           ,'" + PadR(nAction,1) + "' " + Chr(13) + Chr(10) //<ID_TRANS, nchar(1),>
 	cQuery += "           ,'" + cAction + "' " + Chr(13) + Chr(10) //<TRANSAC, nchar(10),>
 	cQuery += "           ,'" + '1' + "' " + Chr(13) + Chr(10) //<ID_ORI, nchar(1),>

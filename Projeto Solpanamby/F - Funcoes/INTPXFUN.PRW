@@ -68,18 +68,19 @@ STATUS	- 0 - AGUARDANDO PROCESSAMENTO
 @return			Nil
 @type			Function
 /*/
-User Function INTPQRY( cEmpCon, cFilCon, cProcess, cStatus, dDtDe, dDtAte )
+User Function INTPQRY( cEmpCon, cFilCon, cProcess, cStatus, dDtDe, dDtAte, nID )
 Local cTable := "% [INTEGRACAO].dbo.XML %"
 Local cAliTmp := GetNextAlias()
 Local aRetorno := {}
 Local aRetAux := {}
 Local cWhere := ""
 
-Default dDtDe := CtoD("")
-Default dDtAte := CtoD("")
 Default cEmpCon := ""
 Default cFilCon := ""
 Default cStatus := ""
+Default dDtDe := CtoD("")
+Default dDtAte := CtoD("")
+Default nID := 0
 
 cWhere := "% "
 cWhere += " ID_PROC = '" + cProcess + "' "
@@ -100,8 +101,13 @@ If ! Empty( cStatus )
 EndIf
 
 //Caso tenha busca por range da datas
-If ! Empty( dDtDe ) .And. !Empty( dDtAte )
+If ! Empty( dDtDe ) .And. ! Empty( dDtAte )
 	cWhere += " AND DATEINT BETWEEN '" + DtoS( dDtDe ) + "' AND '" + DtoS( dDtAte ) + "' "
+EndIf
+
+//Caso tenha busca por ID
+If nID > 0
+	cWhere += " AND ID = " + lTrim(Str(nID)) + " "
 EndIf
 
 cWhere += " %"

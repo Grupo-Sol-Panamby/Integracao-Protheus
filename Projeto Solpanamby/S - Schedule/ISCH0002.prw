@@ -7,37 +7,27 @@
 @return			Nil
 @type			Function
 /*/
-User Function ISCH0002( lSched, cProcess )
+User Function ISCH0002( lSched, cProcess, nID )
 Default lSched := .F.
 Default cProcess := "0"
+Default nID := 0
 
 //Chama processo de cliente
 If cProcess == "0" .OR. cProcess == "001"
 	If ! lSched
-		FwMsgRun( ,{|| U_ISA10001( .F., .F., .T. ) } , , 'Integrando Clientes, Por favor aguarde' )
+		FwMsgRun( ,{|| U_ISA10001( .F., .F., .T., nID ) } , , 'Integrando Clientes, Por favor aguarde' )
 	Else
-		U_ISA10001( .F., .F., .T. )
+		U_ISA10001( .F., .F., .T., nID )
 	EndIf
 EndIf
 
-//	//Chama processo de contrato
-//	If !lSched
-//		FwMsgRun( ,{|| U_ICON0001( lSched ) }			, , 'Integrando Contratos, Por favor aguarde' )
-//	Else
-//		U_ICON0001( lSched )
-//	EndIf
-//
-//	//Chama processo de execucao
-//	If !lSched
-//		FwMsgRun( ,{|| U_IEXE0001( lSched ) }			, , 'Integrando Execuções, Por favor aguarde' )
-//	Else
-//		U_IEXE0001( lSched )
-//	EndIf
-//
-//	//Chama processo de faturamento
-//	If !lSched
-//		FwMsgRun( ,{|| U_IFAT0001( lSched ) }			, , 'Integrando Faturamento, Por favor aguarde' )
-//	Else
-//		U_IFAT0001( lSched )
-//	EndIf
+//Chama processo do faturamento
+If cProcess == "0" .OR. cProcess == "002"
+	If ! lSched
+		FwMsgRun( ,{|| U_IFAT0001( nID ) }			, , 'Integrando Faturamento, Por favor aguarde' )
+	Else
+		U_IFAT0001( nID )
+	EndIf
+EndIf
+
 Return(Nil)
