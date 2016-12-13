@@ -27,9 +27,12 @@
 */
 User Function MALTCLI()
 Local aArea := SA1->(GetArea())
+Local lIntregCom := SuperGetMv('PY_INT001',.T.,.F.) //Parametro responsável por ligar a integração do faturamento com os sistemas legados das empresas de comunicação
 
-If SM0->M0_CODIGO $ "75|80" .AND. SA1->A1_MSBLQL <> "1"
-	U_ISA10001(INCLUI,ALTERA)
+If SM0->M0_CODIGO $ "75|80"
+	If lIntregCom .AND. ! Empty(SA1->A1_XCODEXT)
+		U_ISA10001(INCLUI,ALTERA)
+	EndIf
 EndIf
 
 RestArea(aArea)

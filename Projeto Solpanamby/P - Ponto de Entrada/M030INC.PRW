@@ -15,7 +15,8 @@
 ฑฑฬออออออออออออุออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออนฑฑ
 ฑฑบ Uso        ณ Ponto de Entrada                                               บฑฑ
 ฑฑฬออออออออออออุออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออนฑฑ
-ฑฑบ Parametros ณ Nil                                                            บฑฑ
+ฑฑบ Parametros ณ PARAMIXB - N - Tipo da opera็ใo, 3 significa que o usuario     บฑฑ
+ฑฑบ            ณ                cancelou a inclusao                             บฑฑ
 ฑฑฬออออออออออออุออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออนฑฑ
 ฑฑบ Retorno    ณ Nil                                                            บฑฑ
 ฑฑฬออออออออออออุอออออออออออออัออออออออออออออออออออออออออออออออออออออออออออออออออนฑฑ
@@ -28,11 +29,15 @@
 */
 User Function M030INC()
 Local aArea := SA1->(GetArea())
+Local lIntregCom := SuperGetMv('PY_INT001',.T.,.F.) //Parametro responsแvel por ligar a integra็ใo do faturamento com os sistemas legados das empresas de comunica็ใo
 
-If ParamIXB == 1
-	If SM0->M0_CODIGO $ "75|80" .AND. SA1->A1_MSBLQL <> "1"
-		U_ISA10001(INCLUI,ALTERA)
+If ParamIXB == 0
+	If SM0->M0_CODIGO $ "75|80"
+		If lIntregCom .AND. ! Empty(SA1->A1_XCODEXT)
+			U_ISA10001(INCLUI,ALTERA)
+		EndIf
 	EndIf
+ElseIf ParamIXB == 1
 	If ! SM0->M0_CODIGO $ "A6|A7"
 		WFCliente()
 	EndIf

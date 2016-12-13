@@ -17,7 +17,7 @@ ID_PROC	- 001 - Clientes
 		- 002 - Faturamento
 		- 003 – Pedido de Venda
 		- 004 – Nota Fiscal
-		- 005 – Título Finenceiro (PARCELA)
+		- 005 – Título Financeiro (PARCELA)
 		- 006 - Vendedores
 
 ID_TRANS- 1 - Incluir
@@ -55,7 +55,7 @@ STATUS	- 0 - AGUARDANDO PROCESSAMENTO
 ÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜ
 ±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±
 ±±ÉÍÍÍÍÍÍÍÍÍÍÍÍÑÍÍÍÍÍÍÍÍÍÍÍÍËÍÍÍÍÍÍÍÑÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍËÍÍÍÍÍÍÑÍÍÍÍÍÍÍÍÍÍÍÍ»±±
-±±º Programa   ³ ISF10001   º Autor ³ Alexandre Soares Reis º Data ³ 29/11/2016 º±±
+±±º Programa   ³ ISF20001   º Autor ³ Alexandre Soares Reis º Data ³ 29/11/2016 º±±
 ±±ÌÍÍÍÍÍÍÍÍÍÍÍÍØÍÍÍÍÍÍÍÍÍÍÍÍÊÍÍÍÍÍÍÍÏÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÊÍÍÍÍÍÍÏÍÍÍÍÍÍÍÍÍÍÍÍ¹±±
 ±±º Empresa    ³ Sol Panamby                                                    º±±
 ±±ÌÍÍÍÍÍÍÍÍÍÍÍÍØÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍ¹±±
@@ -77,13 +77,15 @@ STATUS	- 0 - AGUARDANDO PROCESSAMENTO
 ±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±
 ÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜ
 */
-User Function ISF10001(nAction)
+User Function ISF20001(nAction)
 Local aDados := {}
 Local cAction := ""
 Local cDestino := ""
 Local cIDProc := "004"
 Local cProces := "Nota Fiscal de Venda"
+Local cXML := ""
 Local lRet := .T.
+Local nCount := 0
 
 Default nAction := 0
 
@@ -95,9 +97,9 @@ ElseIf SM0->M0_CODIGO == "80" //NOVA BRASIL FM
 	cDestino := "2"
 EndIf
 
-If nAction := 3
+If nAction == 3
 	cAction := "Exclusao"
-ElseIf nAction := 6
+ElseIf nAction == 6
 	cAction := "Impressao"
 EndIf
 
@@ -109,12 +111,12 @@ aAdd(aDados,{"ID_TRANS"       ,PadR(nAction,1)})         //3 - Excluir | 6 – Imp
 aAdd(aDados,{"TRANSAC"        ,cAction})                 //DESCRIÇÃO
 aAdd(aDados,{"ID_ORI"         ,'1'})                     //1 - PROTHEUS | 2 - PULSAR | 3 - SCTV | 4 - MÍDIA+
 aAdd(aDados,{"ID_DES"         ,cDestino})                //1 - PROTHEUS | 2 - PULSAR | 3 - SCTV | 4 - MÍDIA+
-aAdd(aDados,{"ID_TIT"         ,""/*SF1->F1_XCODEXT*/})   //CODIGO NO SISTEMA INTEGRADO
-aAdd(aDados,{"ID_RET"         ,SF1->(F1_DOC + F1_SERIE)})//NUMERO E SERIE DA NOTA FISCAL DE VENDA
-aAdd(aDados,{"DATA_PROCESSO"  ,SF1->F1_EMISSAO})         //DATA DA IMPRESSAO / ESTORNO
-aAdd(aDados,{"HASHCODE"       ,SF1->F1_CHAVE})           //CHAVE DE AUTORIZAÇÃO DO SEFAZ
+aAdd(aDados,{"ID_TIT"         ,SF2->F2_XCODEXT})         //CODIGO NO SISTEMA INTEGRADO
+aAdd(aDados,{"ID_RET"         ,SF2->(rTrim(F2_DOC) + F2_SERIE)})//NUMERO E SERIE DA NOTA FISCAL DE VENDA
+aAdd(aDados,{"DATA_PROCESSO"  ,SF2->F2_EMISSAO})         //DATA DA IMPRESSAO / ESTORNO
+aAdd(aDados,{"HASHCODE"       ,SF2->F2_CHAVE})           //CHAVE DE AUTORIZAÇÃO DO SEFAZ
 
-cXML := fArToXML(aDados,"PARCELA","1.0","UTF-8",@nCount)
+cXML := U_fArToXML(aDados, "PARCELA", "1.0", "UTF-8", @nCount)
 
 cQuery := "INSERT INTO [INTEGRACAO].[dbo].[XML]" + Chr(13) + Chr(10)
 cQuery += "           ([ID_EMP]" + Chr(13) + Chr(10)
@@ -144,7 +146,7 @@ cQuery += "           ,'" + PadR(nAction,1) + "' " + Chr(13) + Chr(10) //<ID_TRA
 cQuery += "           ,'" + cAction + "' " + Chr(13) + Chr(10) //<TRANSAC, nchar(10),>
 cQuery += "           ,'" + '1' + "' " + Chr(13) + Chr(10) //<ID_ORI, nchar(1),>
 cQuery += "           ,'" + cDestino + "' " + Chr(13) + Chr(10) //<ID_DES, nchar(1),>
-cQuery += "           ,'" + SF1->(F1_DOC + F1_SERIE) + "' " + Chr(13) + Chr(10) //<ID_ENT, nchar(8),>
+cQuery += "           ,'" + SF2->(F2_DOC + F2_SERIE) + "' " + Chr(13) + Chr(10) //<ID_ENT, nchar(8),>
 cQuery += "           ,'" + cXML + "' " + Chr(13) + Chr(10) //<XML_ERP, xml,>
 cQuery += "           ,'" + DtoS(Date()) + "' " + Chr(13) + Chr(10) //<DATEINT, date,>
 cQuery += "           ,'" + Time() + "' " + Chr(13) + Chr(10) //<TIMEINT, time(7),>
@@ -159,9 +161,9 @@ If TCSQLExec(cQuery) < 0
 	MsgStop("TCSQLError() " + TCSQLError())
 	lRet := .F.
 Else
-//	RecLock("SF1",.F.)
-//		SF1->F1_MSEXP := DtoS(Date())
-//	SF1->(MsUnLock())
+//	RecLock("SF2",.F.)
+//		SF2->F2_MSEXP := DtoS(Date())
+//	SF2->(MsUnLock())
 	lRet := .T.
 EndIf
 Return(lRet)

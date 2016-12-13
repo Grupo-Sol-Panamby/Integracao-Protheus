@@ -30,6 +30,7 @@ User Function FA070TIT(nParciais)
 Local aArea := Getarea()
 Local _dAno := ""
 Local _dMes := ""
+Local lIntregCom := SuperGetMv('PY_INT001',.T.,.F.) //Parametro responsável por ligar a integração do faturamento com os sistemas legados das empresas de comunicação
 Local lRet := .T.
 Local lZZZ := .F.
 Local nAcresc := 0
@@ -38,7 +39,9 @@ Local nTitAtu := 0
 chist070 := SE1->E1_HIST
 
 If SM0->M0_CODIGO $ "75|80"
-	U_ISE10001(7) //3 - Excluir / 7 – Baixar / 8 - Cancelar
+	If lIntregCom .AND. ! Empty(SE1->E1_XCODEXT)
+		U_ISE10001(7) //3 - Excluir / 7 – Baixar / 8 - Cancelar
+	EndIf
 
 //rodará somente para a empresa Acqua e Titulos gerados pelo GEI e com valor reajustavel  30/01/13
 //atualização do campo Acrescimo para o valor da data do pagamento, quando foi pago com data retoroativa
@@ -90,8 +93,8 @@ ElseIf SM0->M0_CODIGO == "C1" .AND. SE1->E1_TIPO == "BOL" .AND. AllTrim(SE1->E1_
 	If lZZZ
 		While ! ZZZ->(EOF()) .AND. SE1->E1_PREFIXO == ZZZ->ZZZ_PREFIX  .AND. SE1->E1_NUM ==ZZZ->ZZZ_NUM .AND. SE1->E1_PARCELA == ZZZ->ZZZ_PARCEL
 			RecLock("ZZZ",.F.)
-				ZZZ->ZZZ_ACRESC	:= nAcresc
-				ZZZ->ZZZ_TITATU	:= nTitAtu
+				ZZZ->ZZZ_ACRESC := nAcresc
+				ZZZ->ZZZ_TITATU := nTitAtu
 			ZZZ->(Msunlock())
 			ZZZ->(DBSKIP())
 		EndDo

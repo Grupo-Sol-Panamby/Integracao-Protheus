@@ -5,31 +5,30 @@ User Function ClsCliente()
 Return Nil
 
 /*/{Protheus.doc} ClienteSP (ClsCliente)
-@description	Classe Responsavel pela gravacao do Cliente via
-				MsExecAuto.
-@author 		Amedeo D. Paoli Filho
-@version 		1.0
+@description Classe Responsavel pela gravacao do Cliente via MsExecAuto
+@author Amedeo D. Paoli Filho
+@version 1.0
 /*/
 Class ClienteSP From uExecAuto
-    Data cCodigo
-    Data cLoja
+	Data cCodigo
+	Data cLoja
 	Data cChave
 	Data cTpCli
-    Data cCidade
-    Data cCodMun
-    Data cUF
+	Data cCidade
+	Data cCodMun
+	Data cUF
 
-    Method New()
+	Method New()
 	Method AddValues(cCampo, xValor)
-    Method Gravacao(nOpcao)
-    Method GetCodigo()
-    Method GetLoja()
+	Method Gravacao(nOpcao)
+	Method GetCodigo()
+	Method GetLoja()
 EndClass
 
 /*/{Protheus.doc} New
-@Description	Metodo construtor
-@author 		Amedeo D. Paoli Filho
-@version 		1.0
+@Description Metodo construtor
+@author Amedeo D. Paoli Filho
+@version 1.0
 /*/
 Method New() Class ClienteSP
 	_Super:New()
@@ -46,11 +45,11 @@ Method New() Class ClienteSP
 Return Self
 
 /*/{Protheus.doc} AddValues
-@Description	Metodo AddValues
-@param			ExpC1, C, Campo
-@param			ExpC2, C, Valor
-@author 		Amedeo D. Paoli Filho
-@version 		1.0
+@Description Metodo AddValues
+@param ExpC1, C, Campo
+@param ExpC2, C, Valor
+@author Amedeo D. Paoli Filho
+@version 1.0
 /*/
 Method AddValues(cCampo, xValor) Class ClienteSP
 	If AllTrim(cCampo) == "A1_CGC"
@@ -60,29 +59,28 @@ Method AddValues(cCampo, xValor) Class ClienteSP
 		::cTpCli := xValor
 	EndIf
 	If AllTrim(cCampo) == "A1_COD"
-		::cCodigo := PadR(xValor, TamSx3("A1_COD")[1])
+		::cCodigo := PadR(xValor, TamSX3("A1_COD")[1])
 	EndIf
 	If AllTrim(cCampo) == "A1_LOJA"
-		::cLoja := PadR(xValor, TamSx3("A1_LOJA")[1])
+		::cLoja := PadR(xValor, TamSX3("A1_LOJA")[1])
 	EndIf
-	If Alltrim(cCampo) == "A1_MUN"
+	If AllTrim(cCampo) == "A1_MUN"
 		xValor := Upper(xValor)
-		::cCidade := PadR(xValor, TamSx3("A1_MUN")[1])
+		::cCidade := PadR(xValor, TamSX3("A1_MUN")[1])
 	EndIf
-	If Alltrim(cCAmpo) == "A1_EST"
-		::cUF := PadR(xValor, TamSx3("A1_EST")[1])
+	If AllTrim(cCAmpo) == "A1_EST"
+		::cUF := PadR(xValor, TamSX3("A1_EST")[1])
 	EndIf
 
 	_Super:AddValues(cCampo, xValor)
 Return Nil
 
 /*/{Protheus.doc} Gravacao
-@Description	Metodo Gravacao
-@author 		Amedeo D. Paoli Filho
-@version 		1.0
+@Description Metodo Gravacao
+@author Amedeo D. Paoli Filho
+@version 1.0
 /*/
 Method Gravacao(nOpcao) Class ClienteSP
-	Local dDataBackup := dDataBase
 	Local cSeek := ""
 	Local lAchou := .F.
 	Local lReserva := .F.
@@ -90,19 +88,19 @@ Method Gravacao(nOpcao) Class ClienteSP
 
 	::SetEnv(1, "FAT")
 
+	dbSelectArea("SA1")
+
 	//=========================================
 	// Inicia transacao
 	//=========================================
 	Begin Transaction
-		DbSelectArea("SA1")
-
 		If nOpcao == 3
-			If !Empty(::cCodigo) .And. !Empty(::cLoja)
+			If ! Empty(::cCodigo) .AND. ! Empty(::cLoja)
 
 				ConOut( "Inclusao de cliente - Codigo e Loja preenchido" )
 
-				SA1->(DbSetOrder(1))//A1_FILIAL, A1_COD, A1_LOJA
-				If SA1->(DbSeek(xFilial("SA1") + ::cCodigo + ::cLoja))
+				SA1->(dbSetOrder(1)) //A1_FILIAL+A1_COD+A1_LOJA
+				If SA1->(dbSeek(xFilial("SA1") + ::cCodigo + ::cLoja))
 					lRetorno := .F.
 					::cMensagem := "Cliente / Loja já cadastrado.
 				EndIf
@@ -110,20 +108,20 @@ Method Gravacao(nOpcao) Class ClienteSP
 
 				ConOut( "Inclusao de cliente" )
 
-				DbSetOrder(3)//A1_FILIAL, A1_CGC
+				SA1->(dbSetOrder(3)) //A1_FILIAL+A1_CGC
 				If Empty(::cTpCli) .OR. Empty(::cChave)
 					lRetorno := .F.
 					::cMensagem := "Um dos campos Obrigatorios não foi informado. (ClsCliente)"
 				Else
 					If ::cTpCli == "J"
 						cSeek := Substr(::cChave, 1, 8)
-						lAchou := SA1->(DbSeek(xFilial("SA1") + cSeek))
+						lAchou := SA1->(dbSeek(xFilial("SA1") + cSeek))
 					Else
 						cSeek := AllTrim(::cChave)
-						lAchou := SA1->(DbSeek(xFilial("SA1") + cSeek))
+						lAchou := SA1->(dbSeek(xFilial("SA1") + cSeek))
 					EndIf
 
-					DbSetOrder(1)//A1_FILIAL, A1_COD, A1_LOJA
+					SA1->(dbSetOrder(1)) //A1_FILIAL+A1_COD+A1_LOJA
 
 					If lAchou
 						ConOut("Verificando base de CNPJ")
@@ -132,42 +130,38 @@ Method Gravacao(nOpcao) Class ClienteSP
 						::cCodigo := SA1->A1_COD
 						::cLoja := SA1->A1_LOJA
 
-						While !SA1->(Eof()) .And. 	SA1->A1_FILIAL == xFilial("SA1") .And.;
-													SA1->A1_COD == ::cCodigo
-
+						While ! SA1->(EOF()) .AND. SA1->(A1_FILIAL + A1_COD) == xFilial("SA1") + ::cCodigo
 							If AllTrim(::cChave) == AllTrim(SA1->A1_CGC)
 								//Caso o Cliente Ja exista, atualiza os dados
-								nOpcao	:= 4
+								nOpcao := 4
 							EndIf
 
-							SA1->(DbSkip())
+							SA1->(dbSkip())
 						End
 
-						If lRetorno .And. nOpcao == 3
+						If lRetorno .AND. nOpcao == 3
 							::cLoja := Soma1(::cLoja)
 						EndIf
 					Else
-
 						ConOut("Nao encontrado base de CNPJ")
 
 						lReserva := .T.
-						::cCodigo := GetSx8Num("SA1", "A1_COD")
-						::cLoja := StrZero( 1, TamSx3("A1_LOJA")[1] )
-
+						::cCodigo := GetSX8Num("SA1", "A1_COD")
+						::cLoja := StrZero( 1, TamSX3("A1_LOJA")[1] )
 					EndIf
 
-					::AddValues("A1_COD"	,::cCodigo	)
-					::AddValues("A1_LOJA"	,::cLoja	)
-			    EndIf
-		    EndIf
+					::AddValues("A1_COD", ::cCodigo)
+					::AddValues("A1_LOJA", ::cLoja)
+				EndIf
+			EndIf
 		Else
-			DbSetOrder(1)//A1_FILIAL, A1_COD, A1_LOJA
+			SA1->(dbSetOrder(1) ) //A1_FILIAL+A1_COD+A1_LOJA
 
 			If Empty(::cCodigo) .OR. Empty(::cLoja)
 				lRetorno := .F.
 				::cMensagem := "Cliente / Loja não informados."
 			Else
-				If !SA1->(DbSeek(xFilial("SA1") + ::cCodigo + ::cLoja))
+				If ! SA1->(dbSeek(xFilial("SA1") + ::cCodigo + ::cLoja))
 					If nOpcao <> 4
 						lRetorno := .F.
 						::cMensagem := "Cliente / Loja: " + ::cCodigo + "/" + ::cLoja + " não localizado."
@@ -181,27 +175,23 @@ Method Gravacao(nOpcao) Class ClienteSP
 		//Atualiza Codigo de Municipio
 		If lRetorno
 			If Empty(::cCodMun)
-				If !Empty(::cCidade) .And. !Empty(::cUF)
-					DbSelectarea("CC2")
-					DbSetorder(2)
+				If ! Empty(::cCidade) .AND. ! Empty(::cUF)
+					CC2->(dbSetOrder(2))
 
-					If DbSeek(xFilial("CC2") + ::cCidade)
-						While !CC2->( Eof() ) .And. CC2->CC2_FILIAL == xFilial("CC2") .And.;
-													Alltrim(CC2->CC2_MUN) == Alltrim(::cCidade)
-
-							If Alltrim(CC2->CC2_EST) == Alltrim(::cUF)
-								::cCodMun := Alltrim(CC2->CC2_CODMUN)
+					If CC2->(dbSeek(xFilial("CC2") + ::cCidade))
+						While ! CC2->( EOF() ) .AND. CC2->(CC2_FILIAL + AllTrim(CC2_MUN)) == xFilial("CC2") + AllTrim(::cCidade)
+							If AllTrim(CC2->CC2_EST) == AllTrim(::cUF)
+								::cCodMun := AllTrim(CC2->CC2_CODMUN)
 							EndIf
 
-							CC2->( DbSkip() )
+							CC2->( dbSkip() )
 						End
 					EndIf
 
-					DbSelectarea("CC2")
-					DbSetorder(1)
-					DbGotop()
+					CC2->(dbSetOrder(1))
+					CC2->(dbGoTop())
 
-					Aadd(::aValues, { "A1_COD_MUN", ::cCodMun, Nil })
+					aAdd(::aValues, { "A1_COD_MUN", ::cCodMun, Nil })
 				EndIf
 			EndIf
 		EndIf
@@ -213,7 +203,7 @@ Method Gravacao(nOpcao) Class ClienteSP
 			lRetorno := .F.
 
 			//Gravacao do Cliente
-			MSExecAuto({|a, b| MATA030(a, b)}, ::aValues, nOpcao)
+			MsExecAuto({|a, b| MATA030(a, b)}, ::aValues, nOpcao)
 
 			If lMsErroAuto
 				lRetorno := .F.
@@ -226,19 +216,18 @@ Method Gravacao(nOpcao) Class ClienteSP
 					::cMensagem := MostraErro(::cPathLog, ::cFileLog)
 				EndIf
 			Else
-
-				lRetorno	:= .T.
+				lRetorno := .T.
 
 				If lReserva
 					::cCodigo := SA1->A1_COD
 					::cLoja := SA1->A1_LOJA
-					ConfirmSx8()
+					ConfirmSX8()
 				EndIf
 
 			EndIf
 		EndIf
 
-		If !lRetorno
+		If ! lRetorno
 			DisarmTransaction()
 		EndIf
 
@@ -251,17 +240,17 @@ Method Gravacao(nOpcao) Class ClienteSP
 Return lRetorno
 
 /*/{Protheus.doc} GetCodigo
-@Description	Retorna o codigo do cliente
-@author 		Amedeo D. Paoli Filho
-@version 		1.0
+@Description Retorna o codigo do cliente
+@author Amedeo D. Paoli Filho
+@version 1.0
 /*/
 Method GetCodigo() Class ClienteSP
 Return ::cCodigo
 
 /*/{Protheus.doc} GetLoja
-@Description	Retorna a loja do cliente
-@author 		Amedeo D. Paoli Filho
-@version 		1.0
+@Description Retorna a loja do cliente
+@author Amedeo D. Paoli Filho
+@version 1.0
 /*/
 Method GetLoja() Class ClienteSP
 Return ::cLoja

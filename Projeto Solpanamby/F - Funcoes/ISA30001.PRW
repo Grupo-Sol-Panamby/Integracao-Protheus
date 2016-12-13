@@ -17,7 +17,7 @@ ID_PROC	- 001 - Clientes
 		- 002 - Faturamento
 		- 003 – Pedido de Venda
 		- 004 – Nota Fiscal
-		- 005 – Tํtulo Finenceiro (PARCELA)
+		- 005 – Tํtulo Financeiro (PARCELA)
 		- 006 - Vendedores
 
 ID_TRANS- 1 - Incluir
@@ -83,8 +83,8 @@ Local aIntegra := {}
 Local cAction := ""
 Local cDestino := ""
 Local cError := ""
-Local IDProc := "006"
-Local Proces := "Vendedor"
+Local cIDProc := "006"
+Local cProces := "Vendedor"
 Local cQuery := ""
 Local cRetorno := ""
 Local cWarning := ""
@@ -92,8 +92,8 @@ Local cXML := ""
 Local lRet := .F.
 Local nAction := 0
 Local nX := 0
+Local nCount := 0
 Local oXML
-Private nCount := 0
 
 Default lInclui := .F.
 Default lAltera := .F.
@@ -109,68 +109,73 @@ ElseIf SM0->M0_CODIGO == "80" //NOVA BRASIL FM
 EndIf
 
 If lRetorno
-	aIntegra := U_INTPQRY( SM0->M0_CODIGO, SM0->M0_CODFIL, "006", "5", , ,nID ) //RETORNO AGUARDANDO PROCESSAMENTO
-	If Empty(aIntegra)
-		aIntegra := U_INTPQRY( SM0->M0_CODIGO, SM0->M0_CODFIL, "006", "1", , ,nID ) //PROCESSADO COM SUCESSO
-	EndIf
+	aIntegra := U_FQRYXML( SM0->M0_CODIGO, SM0->M0_CODFIL, "006", "5", , ,nID ) //RETORNO AGUARDANDO PROCESSAMENTO
+//	If Empty(aIntegra)
+//		aIntegra := U_FQRYXML( SM0->M0_CODIGO, SM0->M0_CODFIL, "006", "1", , ,nID ) //PROCESSADO COM SUCESSO
+//	EndIf
 	If ! Empty(aIntegra)
 		For nX := 1 To Len(aIntegra)
 			oXML := XmlParser( aIntegra[nX][15], "_", @cError, @cWarning )
 			If Empty(cError) .OR. Empty(cWarning)
-				SA3->(dbSetOrder(1)) //A3_FILIAL+A3_COD
-				If ! Empty(oXML:_VENDEDOR:_ID_RET:Text) .OR. ! Empty(aIntegra[nX][14])
-					If SA3->( dbSeek( xFilial("SA3") + aIntegra[nX][10] ) )
-						RecLock("SA3",.F.)
-							If ! Empty(oXML:_VENDEDOR:_ID_RET:Text)
-								SA3->A3_XCODEXT := Trim(oXML:_VENDEDOR:_ID_RET:Text)
+				If ValType( oXML:_VENDEDOR ) <> "U"
+					SA3->(dbSetOrder(1)) //A3_FILIAL+A3_COD
+					If ! Empty(oXML:_VENDEDOR:_ID_RET:Text) .OR. ! Empty(aIntegra[nX][14])
+						If SA3->( dbSeek( xFilial("SA3") + aIntegra[nX][10] ) )
+							RecLock("SA3",.F.)
+								If ! Empty(oXML:_VENDEDOR:_ID_RET:Text)
+									SA3->A3_XCODEXT := Trim(oXML:_VENDEDOR:_ID_RET:Text)
+								Else
+									SA3->A3_XCODEXT := Trim(aIntegra[nX][14])
+								EndIf
+							SA3->(MsUnLock())
+
+							cQuery := "UPDATE [INTEGRACAO].[dbo].[XML]" + Chr(13) + Chr(10)
+							cQuery += "   SET [STATUS] = '6'" + Chr(13) + Chr(10)
+							cQuery += "WHERE [ID] = " + lTrim(Str(aIntegra[nX][1])) + ""
+
+							If TCSQLExec(cQuery) < 0
+								ConOut( "TCSQLError() " + TCSQLError() )
+								lRet := .F.
 							Else
-								SA3->A3_XCODEXT := Trim(aIntegra[nX][14])
+								RecLock("SA3",.F.)
+									SA3->A3_MSEXP := ""
+								SA3->(MsUnLock())
+
+								lRet := .T.
 							EndIf
-						SA3->(MsUnLock())
+						EndIf
+					Else
+						cError := "Retorno invแlido ou nใo informado."
+						cWarning := "C๓digo do vendedor invแlido ou nใo informado. Favor verificar no sistema integrado se a integra็ใo foi concluํda com sucesso."
+						aAdd(aErro,{"ID_EMP"   ,aIntegra[nX][2]})  //80 - RCC
+						aAdd(aErro,{"ID_FIL"   ,aIntegra[nX][3]})  //01 – SP | 02 – CAMPINAS | 03 – PE | 04 – DF | 05 – BA | 06 – RJ
+						aAdd(aErro,{"ID_PROC"  ,aIntegra[nX][4]})  //006 – VENDEDOR
+						aAdd(aErro,{"PROCES"   ,aIntegra[nX][5]})  //DESCRIวรO
+						aAdd(aErro,{"ID_TRANS" ,aIntegra[nX][6]})  //1 – INCLUIR | 2 – ALTERAR | 3 – EXCLUIR
+						aAdd(aErro,{"TRANSAC"  ,aIntegra[nX][7]})  //DESCRIวรO
+						aAdd(aErro,{"ID_ORI"   ,aIntegra[nX][8]})  //1 - PROTHEUS | 2 - PULSAR | 3 - SCTV | 4 - MอDIA+
+						aAdd(aErro,{"ID_DES"   ,aIntegra[nX][9]})  //1 - PROTHEUS | 2 - PULSAR | 3 - SCTV | 4 - MอDIA+
+						aAdd(aErro,{"ID_ENT"   ,aIntegra[nX][10]}) //CODIGO E LOJA CLIENTE
+						aAdd(aErro,{"COD_EXT"  ,aIntegra[nX][11]}) //CODIGO NO SISTEMA INTEGRADO
+						aAdd(aErro,{"ERRO"     ,"Erro: " + cError + "  -  Aviso: " + cWarning})
+
+						cXML += U_fArToXML(aErro, "ERRO", "1.0", "UTF-8", @nCount)
 
 						cQuery := "UPDATE [INTEGRACAO].[dbo].[XML]" + Chr(13) + Chr(10)
-						cQuery += "   SET [STATUS] = '6'" + Chr(13) + Chr(10)
+						cQuery += "   SET [STATUS] = '7', XML_ERR = '" + cXML + "'" + Chr(13) + Chr(10)
 						cQuery += "WHERE [ID] = " + lTrim(Str(aIntegra[nX][1])) + ""
 
 						If TCSQLExec(cQuery) < 0
 							ConOut( "TCSQLError() " + TCSQLError() )
 							lRet := .F.
 						Else
-							RecLock("SA3",.F.)
-								SA3->A3_MSEXP := ""
-							SA3->(MsUnLock())
-
-							lRet := .T.
+							ConOut( "Erro: " + cError + "  -  Aviso: " + cWarning )
+							lRet := .F.
 						EndIf
 					EndIf
 				Else
-					cError := "Retorno invแlido ou nใo informado."
-					cWarning := "C๓digo do vendedor invแlido ou nใo informado. Favor verificar no sistema integrado se a integra็ใo foi concluํda com sucesso."
-					aAdd(aErro,{"ID_EMP"   ,aIntegra[nX][2]})  //80 - RCC
-					aAdd(aErro,{"ID_FIL"   ,aIntegra[nX][3]})  //01 – SP | 02 – CAMPINAS | 03 – PE | 04 – DF | 05 – BA | 06 – RJ
-					aAdd(aErro,{"ID_PROC"  ,aIntegra[nX][4]})  //006 – VENDEDOR
-					aAdd(aErro,{"PROCES"   ,aIntegra[nX][5]})  //DESCRIวรO
-					aAdd(aErro,{"ID_TRANS" ,aIntegra[nX][6]})  //1 – INCLUIR | 2 – ALTERAR | 3 – EXCLUIR
-					aAdd(aErro,{"TRANSAC"  ,aIntegra[nX][7]})  //DESCRIวรO
-					aAdd(aErro,{"ID_ORI"   ,aIntegra[nX][8]})  //1 - PROTHEUS | 2 - PULSAR | 3 - SCTV | 4 - MอDIA+
-					aAdd(aErro,{"ID_DES"   ,aIntegra[nX][9]})  //1 - PROTHEUS | 2 - PULSAR | 3 - SCTV | 4 - MอDIA+
-					aAdd(aErro,{"ID_ENT"   ,aIntegra[nX][10]}) //CODIGO E LOJA CLIENTE
-					aAdd(aErro,{"COD_EXT"  ,aIntegra[nX][11]}) //CODIGO NO SISTEMA INTEGRADO
-					aAdd(aErro,{"ERRO"     ,"Erro: " + cError + "  -  Aviso: " + cWarning})
-
-					cXML += fArToXML(aErro,"ERRO","1.0","UTF-8",@nCount)
-
-					cQuery := "UPDATE [INTEGRACAO].[dbo].[XML]" + Chr(13) + Chr(10)
-					cQuery += "   SET [STATUS] = '7', XML_ERR = '" + cXML + "'" + Chr(13) + Chr(10)
-					cQuery += "WHERE [ID] = " + lTrim(Str(aIntegra[nX][1])) + ""
-
-					If TCSQLExec(cQuery) < 0
-						ConOut( "TCSQLError() " + TCSQLError() )
-						lRet := .F.
-					Else
-						ConOut( "Erro: " + cError + "  -  Aviso: " + cWarning )
-						lRet := .F.
-					EndIf
+					lRet := .F.
+					aAdd(aErro, {"ERRO"     , "Erro: " + "XML DE VENDEDOR COM FORMATO INVALIDO"})
 				EndIf
 			Else
 				aAdd(aErro,{"ID_EMP"   ,aIntegra[nX][2]})  //80 - RCC
@@ -185,7 +190,7 @@ If lRetorno
 				aAdd(aErro,{"COD_EXT"  ,aIntegra[nX][11]}) //CODIGO NO SISTEMA INTEGRADO
 				aAdd(aErro,{"ERRO"     ,"Erro: " + cError + "  -  Aviso: " + cWarning})
 
-				cXML += fArToXML(aErro,"ERRO","1.0","UTF-8",@nCount)
+				cXML += U_fArToXML(aErro, "ERRO", "1.0", "UTF-8", @nCount)
 
 				cQuery := "UPDATE [INTEGRACAO].[dbo].[XML]" + Chr(13) + Chr(10)
 				cQuery += "   SET [STATUS] = '7', XML_ERR = '" + cXML + "'" + Chr(13) + Chr(10)
@@ -226,6 +231,7 @@ Else
 	aAdd(aDados,{"RAZAO_SOCIAL"   ,SA3->A3_NOME})            //RAZรO SOCIAL
 	aAdd(aDados,{"NOME_FANTASIA"  ,SA3->A3_NREDUZ})          //NOME FANTASIA
 	aAdd(aDados,{"CNPJ"           ,SA3->A3_CGC})             //CNPJ
+	aAdd(aDados,{"TIPO_CLIENTE"   ,"6"})                     //TIPO CLIENTE (1 - CLIENTE | 2 - AGENCIA | 3 - AMBOS | 6 - VENDEDOR)
 	aAdd(aDados,{"TIPO"           ,SA3->A3_TIPO})            //TIPO (I - INTERNO | E - EXTERNO)
 	aAdd(aDados,{"TIPO_COMISSAO"  ,SA3->A3_TIPOCOM})         //TIPO COMISSAO (1 - META | 2 - ALวADA | 3 - NORMAL)
 	aAdd(aDados,{"PERC_COMISSAO"  ,SA3->A3_COMIS})           //PERCENTUAL COMISSAO
@@ -250,7 +256,7 @@ Else
 	aAdd(aDados,{"EMAIL"          ,SA3->A3_EMAIL})           //E-MAIL
 	aAdd(aDados,{"SITE"           ,SA3->A3_HPAGE})           //HOME PAGE
 
-	cXML := fArToXML(aDados,"VENDEDOR","1.0","UTF-8",@nCount)
+	cXML := U_fArToXML(aDados, "VENDEDOR", "1.0", "UTF-8", @nCount)
 
 	cQuery := "INSERT INTO [INTEGRACAO].[dbo].[XML]" + Chr(13) + Chr(10)
 	cQuery += "           ([ID_EMP]" + Chr(13) + Chr(10)
@@ -302,79 +308,3 @@ Else
 	EndIf
 EndIf
 Return(lRet)
-
-/*
-ÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜ
-ฑฑฑฑฑฑฑฑฑฑฑฑฑฑฑฑฑฑฑฑฑฑฑฑฑฑฑฑฑฑฑฑฑฑฑฑฑฑฑฑฑฑฑฑฑฑฑฑฑฑฑฑฑฑฑฑฑฑฑฑฑฑฑฑฑฑฑฑฑฑฑฑฑฑฑฑฑฑฑฑฑฑฑ
-ฑฑษออออออออออออัออออออออออออหอออออออัอออออออออออออออออออออออหออออออัออออออออออออปฑฑ
-ฑฑบ Funcao     ณ fArToXML   บ Autor ณ Alexandre Soares Reis บ Data ณ 07/06/2016 บฑฑ
-ฑฑฬออออออออออออุออออออออออออสอออออออฯอออออออออออออออออออออออสออออออฯออออออออออออนฑฑ
-ฑฑบ Descricao  ณ Fun็ใo responsแvel por converter um Array para XML com op็ใo   บฑฑ
-ฑฑบ            ณ de chamada recursiva                                           บฑฑ
-ฑฑฬออออออออออออุออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออนฑฑ
-ฑฑบ Parametros ณ aXML       - A - Arry com os dados do XML                      บฑฑ
-ฑฑบ            ณ cTagPai    - S - Nome da TAG PAI                               บฑฑ
-ฑฑบ            ณ cVersion   - S - Versใo do XML                                 บฑฑ
-ฑฑบ            ณ cEncoding  - S - Tipo de codifica็ใo utilizada                 บฑฑ
-ฑฑฬออออออออออออุออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออนฑฑ
-ฑฑบ Retorno    ณ cRet - C - String do XML                                       บฑฑ
-ฑฑฬออออออออออออุอออออออออออออัออออออออออออออออออออออออออออออออออออออออออออออออออนฑฑ
-ฑฑบ Data       ณ Analista    ณDescricao da Alteracao                            บฑฑ
-ฑฑบ============ณ=============ณ==================================================บฑฑ
-ฑฑบ __/__/____ ณ ___________ ณ                                                  บฑฑ
-ฑฑศออออออออออออฯอออออออออออออฯออออออออออออออออออออออออออออออออออออออออออออออออออผฑฑ
-ฑฑฑฑฑฑฑฑฑฑฑฑฑฑฑฑฑฑฑฑฑฑฑฑฑฑฑฑฑฑฑฑฑฑฑฑฑฑฑฑฑฑฑฑฑฑฑฑฑฑฑฑฑฑฑฑฑฑฑฑฑฑฑฑฑฑฑฑฑฑฑฑฑฑฑฑฑฑฑฑฑฑฑ
-ÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜ
-*/
-Static Function fArToXML(aXML,cTagPai,cVersion,cEncoding,nCount)
-Local cRet := ""
-Local nX := 0
-
-Default aXML := {}
-Default cTagPai := ""
-Default cVersion := "1.0"
-Default cEncoding := "UTF-8"
-//Default lRecursiva := .F. //IsInCallStack("fArToXML")
-
-nCount ++
-For nX := 1 To Len(aXML)
-	If ValType(aXML[nX]) == "C"
-		cRet += '<' + cTagPai + '>' + Chr(13) + Chr(10)
-		cRet += fArToXML(aXML[2],aXML[1],"","",@nCount)
-		cRet += '</' + cTagPai + '>' + If(nCount > 1,Chr(13) + Chr(10),'')
-		Exit
-	Else
-		If nX == 1
-			If nCount == 1
-				cRet += '<?xml version="' + cVersion + '" encoding="' + cEncoding + '" ?>' + Chr(13) + Chr(10)
-			EndIf
-			cRet += '<' + cTagPai + '>' + Chr(13) + Chr(10)
-		EndIf
-
-		If ValType(aXML[nX][2]) != "A"
-			cRet += '<' + aXML[nX][1] + '>'
-		EndIf
-		If ValType(aXML[nX][2]) == "A"
-			cRet += fArToXML(aXML[nX][2],aXML[nX][1],"","",@nCount)
-		ElseIf ValType(aXML[nX][2]) == "C"
-			cRet += '<![CDATA[' + AllTrim(aXML[nX][2]) + ']]>'
-		ElseIf ValType(aXML[nX][2]) == "D"
-			cRet += '<![CDATA[' + DtoC(aXML[nX][2]) + ']]>'
-		ElseIf ValType(aXML[nX][2]) == "L"
-			cRet += '<![CDATA[' + If(aXML[nX][2], "true", "false") + ']]>'
-		ElseIf ValType(aXML[nX][2]) == "N"
-			cRet += '<![CDATA[' + AllTrim(Str(aXML[nX][2])) + ']]>'
-		Else
-			cRet += ''
-		EndIf
-		If ValType(aXML[nX][2]) != "A"
-			cRet += '</' + aXML[nX][1] + '>' + Chr(13) + Chr(10)
-		EndIf
-
-		If nX == Len(aXML)
-			cRet += '</' + cTagPai + '>' + If(nCount > 1,Chr(13) + Chr(10),'')
-		EndIf
-	EndIf
-Next(nX)
-nCount--
-Return(cRet)

@@ -17,7 +17,7 @@ ID_PROC	- 001 - Clientes
 		- 002 - Faturamento
 		- 003 – Pedido de Venda
 		- 004 – Nota Fiscal
-		- 005 – Título Finenceiro (PARCELA)
+		- 005 – Título Financeiro (PARCELA)
 		- 006 - Vendedores
 
 ID_TRANS- 1 - Incluir
@@ -83,9 +83,11 @@ Local aDados := {}
 Local cAction := ""
 Local cDestino := ""
 Local cIDProc := "005"
-Local cProces := "Título Finenceiro (PARCELA)"
+Local cProces := "Tit. Finan"//"Título Financeiro (PARCELA)"
+Local cXML := ""
 Local dData := dDataBase
 Local lRet := .T.
+Local nCount := 0
 Local nValor := 0
 
 Default nAction := 0
@@ -98,14 +100,14 @@ ElseIf SM0->M0_CODIGO == "80" //NOVA BRASIL FM
 	cDestino := "2"
 EndIf
 
-If nAction := 3
+If nAction == 3
 	cAction := "Exclusao"
 	nValor := SE1->E1_VALOR
-ElseIf nAction := 7
+ElseIf nAction == 7
 	cAction := "Baixa"
 	dData := SE1->E1_BAIXA
 	nValor := SE5->E5_VALOR
-ElseIf nAction := 8
+ElseIf nAction == 8
 	cAction := "Cancelamento"
 	nValor := SE5->E5_VALOR
 EndIf
@@ -119,14 +121,14 @@ aAdd(aDados,{"TRANSAC"        ,cAction})                 //DESCRIÇÃO
 aAdd(aDados,{"ID_ORI"         ,'1'})                     //1 - PROTHEUS | 2 - PULSAR | 3 - SCTV | 4 - MÍDIA+
 aAdd(aDados,{"ID_DES"         ,cDestino})                //1 - PROTHEUS | 2 - PULSAR | 3 - SCTV | 4 - MÍDIA+
 aAdd(aDados,{"ID_TIT"         ,""/*SE1->E1_XCODEXT*/})         //CODIGO NO SISTEMA INTEGRADO
-aAdd(aDados,{"ID_RET"         ,SE1->(E1_NUM + E1_PARCELA)})    //NUMERO DO TITULO PARCELA
+aAdd(aDados,{"ID_RET"         ,SE1->(rTrim(E1_NUM) + E1_PARCELA)})    //NUMERO DO TITULO PARCELA
 aAdd(aDados,{"DATA_PROCESSO"  ,dData})                   //DATA DA BAIXA / CANCELAMENTO / ESTORNO
 aAdd(aDados,{"VALOR_BAIXA"    ,SE5->E5_VALOR})           //VALOR DA BAIXA DO TITULO
 aAdd(aDados,{"VALOR_ACRESCIMO",SE1->E1_ACRESC})          //VALOR DO ACRESCIMO DO TITULO /*E1_MULTA + E1_JUROS*/
 aAdd(aDados,{"VALOR_DESCONTO" ,SE1->E1_DESCONT})         //VALOR DO DESCONTO DO TITULO
 aAdd(aDados,{"OBSERVACOES"    ,SE1->E1_HIST})            //OBSERVAÇÃO
 
-cXML := fArToXML(aDados,"PARCELA","1.0","UTF-8",@nCount)
+cXML := U_fArToXML(aDados, "PARCELA", "1.0", "UTF-8", @nCount)
 
 cQuery := "INSERT INTO [INTEGRACAO].[dbo].[XML]" + Chr(13) + Chr(10)
 cQuery += "           ([ID_EMP]" + Chr(13) + Chr(10)
@@ -156,7 +158,7 @@ cQuery += "           ,'" + PadR(nAction,1) + "' " + Chr(13) + Chr(10) //<ID_TRA
 cQuery += "           ,'" + cAction + "' " + Chr(13) + Chr(10) //<TRANSAC, nchar(10),>
 cQuery += "           ,'" + '1' + "' " + Chr(13) + Chr(10) //<ID_ORI, nchar(1),>
 cQuery += "           ,'" + cDestino + "' " + Chr(13) + Chr(10) //<ID_DES, nchar(1),>
-cQuery += "           ,'" + SE1->(E1_NUM + E1_PARCELA) + "' " + Chr(13) + Chr(10) //<ID_ENT, nchar(8),>
+cQuery += "           ,'" + SE1->(rTrim(E1_NUM) + E1_PARCELA) + "' " + Chr(13) + Chr(10) //<ID_ENT, nchar(8),>
 cQuery += "           ,'" + cXML + "' " + Chr(13) + Chr(10) //<XML_ERP, xml,>
 cQuery += "           ,'" + DtoS(Date()) + "' " + Chr(13) + Chr(10) //<DATEINT, date,>
 cQuery += "           ,'" + Time() + "' " + Chr(13) + Chr(10) //<TIMEINT, time(7),>

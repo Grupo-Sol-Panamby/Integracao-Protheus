@@ -27,9 +27,12 @@
 */
 User Function M521DNFS(aPedido)
 Local aArea := SF1->(GetArea())
+Local lIntregCom := SuperGetMv('PY_INT001',.T.,.F.) //Parametro responsável por ligar a integração do faturamento com os sistemas legados das empresas de comunicação
 
 If SM0->M0_CODIGO $ "75|80"
-	U_ISF10001(3) //3 - Excluir / 6 – Impimir
+	If lIntregCom .AND. ! Empty(SF1->F1_XCODEXT)
+		U_ISF10001(3) //3 - Excluir / 6 – Impimir
+	EndIf
 EndIf
 
 RestArea(aArea)

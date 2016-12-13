@@ -6,8 +6,7 @@ Return Nil
 
 /*==========================================================================
  Classe.......: uExecAuto
- Descricao....: Gravacao via Rotina Automatica: deve ser utilizada por
- 				Heranca.
+ Descricao....: Gravacao via Rotina Automatica: deve ser utilizada por Heranca
  Autor........: Amedeo D. Paoli Filho
  Parametros...: Nil
  Retorno......: Nil
@@ -46,44 +45,44 @@ Class uExecAuto
 EndClass
 
 /*==========================================================================
- Metodo........: 	New
- Descricao.....: 	Inicializa o Objeto
- Parametros....:	Nil
+ Metodo........: New
+ Descricao.....: Inicializa o Objeto
+ Parametros....: Nil
 ==========================================================================*/
 Method New() Class uExecAuto
-	::aCabec		:= {}
-	::aItens		:= {}
-	::aItemTemp	 	:= {}
-	::aTabelas		:= {}
-	::aValues		:= {}
+	::aCabec := {}
+	::aItens := {}
+	::aItemTemp := {}
+	::aTabelas := {}
+	::aValues := {}
 
-	::cEmpBkp		:= ""
-	::cFilBkp		:= ""
-	::cEmpGrv		:= ""
-	::cFilGrv		:= ""
-	::cMensagem		:= ""
+	::cEmpBkp := ""
+	::cFilBkp := ""
+	::cEmpGrv := ""
+	::cFilGrv := ""
+	::cMensagem := ""
 
-	::nTime			:= ""
-	::cProcTOut		:= SuperGetMV("SP_PROCTMO", NIL, "000")
-	::nTimeOut		:= SuperGetMV("SP_INTTIMO", NIL, 99999999999)
+	::nTime := ""
+	::cProcTOut := SuperGetMV("SP_PROCTMO", NIL, "000")
+	::nTimeOut := SuperGetMV("SP_INTTIMO", NIL, 99999999999)
 
-	::cFileLog		:= "MATAXXX.LOG"
-	::cPathLog		:= U_SPCAMGRV("L")
+	::cFileLog := "MATAXXX.LOG"
+	::cPathLog := U_SPCAMGRV("L")
 
-	::dEmissao		:= CtoD("  /  /  ")
+	::dEmissao := CtoD("  /  /  ")
 
-	::lExibeTela	:= .F.
-	::lGravaLog		:= .T.
+	::lExibeTela := .F.
+	::lGravaLog := .T.
 Return Self
 
 /*==========================================================================
- Metodo........: 	AddValues
- Descricao.....: 	Armazena os valores para gravacao
- Parametros....:	cCampo - Nome do Campo para Gravacao
- 					xValor - Valor do Campo para Gravacao
+ Metodo........: AddValues
+ Descricao.....: Armazena os valores para gravacao
+ Parametros....: cCampo - Nome do Campo para Gravacao
+ 				 xValor - Valor do Campo para Gravacao
 ==========================================================================*/
 Method AddValues(cCampo, xValor) Class uExecAuto
-	Local nPosCpo	:= Ascan(::aValues, {|x| AllTrim(x[01]) == AllTrim(cCampo)})
+	Local nPosCpo := aScan(::aValues, {|x| AllTrim(x[01]) == AllTrim(cCampo)})
 
 	If AllTrim(cCampo) == "EMPRESA"
 		::cEmpGrv := xValor
@@ -92,7 +91,7 @@ Method AddValues(cCampo, xValor) Class uExecAuto
 			::cFilGrv := xValor
 		Else
 			If nPosCpo == 0
-				Aadd(::aValues, {cCampo		,xValor		,NIL})
+				aAdd(::aValues, {cCampo, xValor, NIL})
 			Else
 				::aValues[nPosCpo][02] := xValor
 			EndIf
@@ -101,22 +100,22 @@ Method AddValues(cCampo, xValor) Class uExecAuto
 Return Nil
 
 /*==========================================================================
- Metodo........: 	AddCabec
- Descricao.....: 	Armazena os Valores do Cabecalho do para gravacao.
- Parametros....:	cCampo - Nome do Campo para Gravacao
- 					xValor - Valor do Campo para Gravacao
+ Metodo........: AddCabec
+ Descricao.....: Armazena os Valores do Cabecalho do para gravacao.
+ Parametros....: cCampo - Nome do Campo para Gravacao
+ 				 xValor - Valor do Campo para Gravacao
 ==========================================================================*/
 Method AddCabec(cCampo, xValor) Class uExecAuto
-	Local nPosCpo := Ascan(::aCabec, {|x| x[01] == cCampo})		//Posicao do Campo no Array
+	Local nPosCpo := aScan(::aCabec, {|x| x[01] == cCampo}) //Posicao do Campo no Array
 
 	If AllTrim(cCampo) == "EMPRESA"
 		::cEmpGrv := xValor
 	Else
 		If "_FILIAL" $ AllTrim(cCampo)
-			::cFilGrv	:= xValor
+			::cFilGrv := xValor
 		Else
 			If nPosCpo == 0
-				Aadd(::aCabec, {cCampo, xValor, NIL})
+				aAdd(::aCabec, {cCampo, xValor, NIL})
 			Else
 				::aCabec[nPosCpo][02] := xValor
 			EndIf
@@ -125,17 +124,17 @@ Method AddCabec(cCampo, xValor) Class uExecAuto
 Return Nil
 
 /*==========================================================================
- Metodo........: 	AddItem
- Descricao.....: 	Armazena os Valores do Item para gravacao.
- Parametros....:	cCampo - Nome do Campo para Gravacao
- 					xValor - Valor do Campo para Gravacao
+ Metodo........: AddItem
+ Descricao.....: Armazena os Valores do Item para gravacao.
+ Parametros....: cCampo - Nome do Campo para Gravacao
+ 				 xValor - Valor do Campo para Gravacao
 ==========================================================================*/
 Method AddItem(cCampo, xValor) Class uExecAuto
-	Local nPosCpo := Ascan(::aItemTemp, {|x| x[01] == cCampo})
+	Local nPosCpo := aScan(::aItemTemp, {|x| x[01] == cCampo})
 
-	If !AllTrim(cCampo) == "EMPRESA"
+	If ! AllTrim(cCampo) == "EMPRESA"
 		If nPosCpo == 0
-			Aadd(::aItemTemp, {cCampo, xValor, NIL})
+			aAdd(::aItemTemp, {cCampo, xValor, NIL})
 		Else
 			::aItemTemp[nPosCpo][02] := xValor
 		EndIf
@@ -143,14 +142,14 @@ Method AddItem(cCampo, xValor) Class uExecAuto
 Return Nil
 
 /*==========================================================================
- Metodo........: 	SetItem
- Descricao.....: 	Armazena os Valores do Item e Reinicializa o Array Temporario.
- Parametros....:	cCampo - Nome do Campo para Gravacao
- 					xValor - Valor do Campo para Gravacao
+ Metodo........: SetItem
+ Descricao.....: Armazena os Valores do Item e Reinicializa o Array Temporario.
+ Parametros....: cCampo - Nome do Campo para Gravacao
+ 				 xValor - Valor do Campo para Gravacao
 ==========================================================================*/
 Method SetItem() Class uExecAuto
 	If Len(::aItemTemp) > 0
-		Aadd(::aItens, ::aItemTemp)
+		aAdd(::aItens, ::aItemTemp)
 		::aItemTemp := {}
 	EndIf
 Return Nil
@@ -161,31 +160,31 @@ Return Nil
  Parametros...: nOpcao -> 1 = Prepara / 2 = Restaura
 ==========================================================================*/
 Method SetEnv(nOpcao, cModulo, lTroca) Class uExecAuto
-	Local	nTamEmp		:= Len(::cEmpGrv)
+	Local nTamEmp := Len(::cEmpGrv)
 
-	Default cModulo 	:= "FAT"
-	Default lTroca		:= .F.
+	Default cModulo := "FAT"
+	Default lTroca := .F.
 
 	If nTamEmp > 2
 		::cEmpGrv := Substr(::cEmpGrv, 1, 2)
 	EndIf
 
 	If nOpcao == 1
-		If !Empty(::cEmpGrv) .AND. !Empty(::cFilGrv)
+		If ! Empty(::cEmpGrv) .AND. ! Empty(::cFilGrv)
 			::cEmpBkp := cEmpAnt
 			::cFilBkp := cFilAnt
 
-			If (::cEmpGrv <> ::cEmpBkp .OR. ::cFilGrv <> ::cFilBkp) .Or. lTroca
+			If (::cEmpGrv <> ::cEmpBkp .OR. ::cFilGrv <> ::cFilBkp) .OR. lTroca
 				RpcClearEnv()
 				RPCSetType(3)
 				RpcSetEnv(::cEmpGrv, ::cFilGrv, NIL, NIL, cModulo, NIL, ::aTabelas)
 			EndIf
 		EndIf
 
-		::lExibeTela	:= SuperGetMV("SP_SHOWERR", NIL, .F.)
-		::lGravaLog		:= SuperGetMV("SP_GRVLOG", NIL, .T.)
+		::lExibeTela := SuperGetMV("SP_SHOWERR", NIL, .F.)
+		::lGravaLog := SuperGetMV("SP_GRVLOG", NIL, .T.)
 	Else
-		If !Empty(::cEmpBkp) .AND. !Empty(::cFilBkp)
+		If ! Empty(::cEmpBkp) .AND. ! Empty(::cFilBkp)
 			If ::cEmpBkp <> cEmpAnt .OR. ::cFilBkp <> cFilAnt
 				RpcClearEnv()
 				RPCSetType(3)
@@ -196,9 +195,9 @@ Method SetEnv(nOpcao, cModulo, lTroca) Class uExecAuto
 Return Nil
 
 /*==========================================================================
- Metodo........: 	GetMensagem
- Descricao.....: 	Retorna a Mensagem de Erro do ExecAuto
- Parametros....:	Nil
+ Metodo........: GetMensagem
+ Descricao.....: Retorna a Mensagem de Erro do ExecAuto
+ Parametros....: Nil
 ==========================================================================*/
 Method GetMensagem() Class uExecAuto
 Return ::cMensagem

@@ -17,7 +17,7 @@ ID_PROC	- 001 - Clientes
 		- 002 - Faturamento
 		- 003 – Pedido de Venda
 		- 004 – Nota Fiscal
-		- 005 – Tํtulo Finenceiro (PARCELA)
+		- 005 – Tํtulo Financeiro (PARCELA)
 		- 006 - Vendedores
 
 ID_TRANS- 1 - Incluir
@@ -52,7 +52,7 @@ STATUS	- 0 - AGUARDANDO PROCESSAMENTO
 -------------------------------------------------
 /*/
 
-/*/{Protheus.doc} IFAT0001
+/*/{Protheus.doc} IFAT0002
 @description 	Integracao de Faturamento
 @author 		Amedeo D. Paoli Filho
 @since 			27/06/2016
@@ -60,7 +60,7 @@ STATUS	- 0 - AGUARDANDO PROCESSAMENTO
 @return			Nil
 @type 			Function
 /*/
-User Function IFAT0001( nID )
+User Function IFAT0002( nID )
 Local aIntegra := {}
 Local aRetProc := {}
 Local aRetorno := {}
@@ -69,7 +69,7 @@ Local cError := ""
 Local cWarning := ""
 Local cXML := ""
 Local lErro := .F.
-Local lNFTit := .T.
+Local lNFTit := SuperGetMv('PY_INT002',.T.,.F.) //Parametro responsแvel por ligar gera็ใo da NF e Tํtulos no financeiro na integra็ใo do faturamento com os sistemas legados das empresas de comunica็ใo
 Local lRet := .T.
 Local nX := 0
 Local nCount := 0
@@ -77,7 +77,7 @@ Local oXml
 
 Default nID := 0
 
-aIntegra := U_INTPQRY( SM0->M0_CODIGO, SM0->M0_CODFIL, "002", "0", , ,nID ) //RETORNO AGUARDANDO PROCESSAMENTO
+aIntegra := U_FQRYXML( SM0->M0_CODIGO, SM0->M0_CODFIL, "002", "0", , ,nID ) //RETORNO AGUARDANDO PROCESSAMENTO
 
 If Len( aIntegra ) > 0
 	For nX := 1 To Len( aIntegra )
@@ -122,7 +122,7 @@ If Len( aIntegra ) > 0
 			cQuery += "   SET [XML_RET] = '" + cXML + "'" + Chr(13) + Chr(10)
 			cQuery += "      ,[DATERET] = '" + DtoS(Date()) + "'" + Chr(13) + Chr(10)
 			cQuery += "      ,[TIMERET] = '" + Time() + "'" + Chr(13) + Chr(10)
-			cQuery += "      ,[STATUS] = '1'" + Chr(13) + Chr(10)
+			cQuery += "      ,[STATUS] = '5'" + Chr(13) + Chr(10)
 			cQuery += "WHERE [ID] = " + lTrim(Str(aIntegra[nX][1])) + ""
 
 			If TCSQLExec(cQuery) < 0
@@ -201,7 +201,7 @@ If ValType( oXml:_Faturamento ) <> "U"
 	EndIf
 Else
 	lRetErro := .T.
-	aAdd(aErro, {"ERRO"     , "Erro: " + "XML DE CONTRATO COM FORMATO INVALIDO"})
+	aAdd(aErro, {"ERRO"     , "Erro: " + "XML DE FATURAMENTO COM FORMATO INVALIDO"})
 EndIf
 
 If cFilAnt == "01"
@@ -251,7 +251,7 @@ For nX := 1 To Len( aContFat )
 
 	For nNf := 1 To Len( aNotas )  // **** VERIFICAR CำDIGO ****
 		//Pega parcelas
-		If Valtype( aNotas[ nNf ]:_Parcelas:_Parcela ) == "A"
+		If ValType( aNotas[ nNf ]:_Parcelas:_Parcela ) == "A"
 			aParcela := aNotas[ nNf ]:_Parcelas:_Parcela
 		Else
 			aParcela := { aNotas[ nNf ]:_Parcelas:_Parcela }
@@ -345,7 +345,7 @@ For nX := 1 To Len( aContFat )
 	If ! Empty( cPedido ) .AND. lNFTit
 		aAdd(aRetorno, {"ID_RET"   , cPedido}) //CODIGO DO PEDIDO DE VENDA
 
-		If SC5->( DbSeek( xFilial("SC5") + cPedido ) )
+		If SC5->( dbSeek( xFilial("SC5") + cPedido ) )
 			For nFat := 1 To Len( aNotas )
 				//Instancia Classe de faturamento
 				oNotaFis := NFSaida():New()
@@ -541,79 +541,3 @@ For nX := 1 To Len(cString)
 	EndIf
 Next nX
 Return(cString)
-
-/*
-ÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜ
-ฑฑฑฑฑฑฑฑฑฑฑฑฑฑฑฑฑฑฑฑฑฑฑฑฑฑฑฑฑฑฑฑฑฑฑฑฑฑฑฑฑฑฑฑฑฑฑฑฑฑฑฑฑฑฑฑฑฑฑฑฑฑฑฑฑฑฑฑฑฑฑฑฑฑฑฑฑฑฑฑฑฑฑ
-ฑฑษออออออออออออัออออออออออออหอออออออัอออออออออออออออออออออออหออออออัออออออออออออปฑฑ
-ฑฑบ Funcao     ณ fArToXML   บ Autor ณ Alexandre Soares Reis บ Data ณ 07/06/2016 บฑฑ
-ฑฑฬออออออออออออุออออออออออออสอออออออฯอออออออออออออออออออออออสออออออฯออออออออออออนฑฑ
-ฑฑบ Descricao  ณ Fun็ใo responsแvel por converter um Array para XML com op็ใo   บฑฑ
-ฑฑบ            ณ de chamada recursiva                                           บฑฑ
-ฑฑฬออออออออออออุออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออนฑฑ
-ฑฑบ Parametros ณ aXML       - A - Arry com os dados do XML                      บฑฑ
-ฑฑบ            ณ cTagPai    - S - Nome da TAG PAI                               บฑฑ
-ฑฑบ            ณ cVersion   - S - Versใo do XML                                 บฑฑ
-ฑฑบ            ณ cEncoding  - S - Tipo de codifica็ใo utilizada                 บฑฑ
-ฑฑฬออออออออออออุออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออนฑฑ
-ฑฑบ Retorno    ณ cRet - C - String do XML                                       บฑฑ
-ฑฑฬออออออออออออุอออออออออออออัออออออออออออออออออออออออออออออออออออออออออออออออออนฑฑ
-ฑฑบ Data       ณ Analista    ณDescricao da Alteracao                            บฑฑ
-ฑฑบ============ณ=============ณ==================================================บฑฑ
-ฑฑบ __/__/____ ณ ___________ ณ                                                  บฑฑ
-ฑฑศออออออออออออฯอออออออออออออฯออออออออออออออออออออออออออออออออออออออออออออออออออผฑฑ
-ฑฑฑฑฑฑฑฑฑฑฑฑฑฑฑฑฑฑฑฑฑฑฑฑฑฑฑฑฑฑฑฑฑฑฑฑฑฑฑฑฑฑฑฑฑฑฑฑฑฑฑฑฑฑฑฑฑฑฑฑฑฑฑฑฑฑฑฑฑฑฑฑฑฑฑฑฑฑฑฑฑฑฑ
-ÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜ
-*/
-Static Function fArToXML(aXML, cTagPai, cVersion, cEncoding, nCount)
-Local cRet := ""
-Local nX := 0
-
-Default aXML := {}
-Default cTagPai := ""
-Default cVersion := "1.0"
-Default cEncoding := "UTF-8"
-//Default lRecursiva := .F. //IsInCallStack("fArToXML")
-
-nCount ++
-For nX := 1 To Len(aXML)
-	If ValType(aXML[nX]) == "C"
-		cRet += '<' + cTagPai + '>' + Chr(13) + Chr(10)
-		cRet += fArToXML(aXML[2], aXML[1], "", "", @nCount)
-		cRet += '</' + cTagPai + '>' + If(nCount > 1, Chr(13) + Chr(10), '')
-		Exit
-	Else
-		If nX == 1
-			If nCount == 1
-				cRet += '<?xml version="' + cVersion + '" encoding="' + cEncoding + '" ?>' + Chr(13) + Chr(10)
-			EndIf
-			cRet += '<' + cTagPai + '>' + Chr(13) + Chr(10)
-		EndIf
-
-		If ValType(aXML[nX][2]) != "A"
-			cRet += '<' + aXML[nX][1] + '>'
-		EndIf
-		If ValType(aXML[nX][2]) == "A"
-			cRet += fArToXML(aXML[nX][2], aXML[nX][1], "", "", @nCount)
-		ElseIf ValType(aXML[nX][2]) == "C"
-			cRet += '<![CDATA[' + AllTrim(aXML[nX][2]) + ']]>'
-		ElseIf ValType(aXML[nX][2]) == "D"
-			cRet += '<![CDATA[' + DtoC(aXML[nX][2]) + ']]>'
-		ElseIf ValType(aXML[nX][2]) == "L"
-			cRet += '<![CDATA[' + If(aXML[nX][2], "true", "false") + ']]>'
-		ElseIf ValType(aXML[nX][2]) == "N"
-			cRet += '<![CDATA[' + AllTrim(Str(aXML[nX][2])) + ']]>'
-		Else
-			cRet += ''
-		EndIf
-		If ValType(aXML[nX][2]) != "A"
-			cRet += '</' + aXML[nX][1] + '>' + Chr(13) + Chr(10)
-		EndIf
-
-		If nX == Len(aXML)
-			cRet += '</' + cTagPai + '>' + If(nCount > 1, Chr(13) + Chr(10), '')
-		EndIf
-	EndIf
-Next(nX)
-nCount--
-Return(cRet)

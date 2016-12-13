@@ -1,13 +1,13 @@
 #Include "Totvs.ch"
 
-/*/{Protheus.doc} ILOG0001
+/*/{Protheus.doc} MLOG0001
 @description	Tela com Log de integracoes (ERP x Pulsar)
 @author			Amedeo D. Paoli Filho
 @version		1.0
 @return			Nil
 @type			Function
 /*/
-User Function ILOG0001()
+User Function MLOG0001()
 Local aArea := GetArea()
 Local lRetorno := .T.
 
@@ -81,38 +81,38 @@ Return(lRetorno)
 @type			Function
 /*/
 Static Function Monitor( aParam )
-Local oFontLeg	:= TFont():New("Verdana",,012,,.T.,,,,,.F.,.F.)
-Local oFontPan 	:= TFont():New("Verdana",,012,,.T.,,,,,.F.,.F.)
-Local bCarga 	:= { || FwMsgRun( ,{|| RefBrowse( @aLbxLog, @oLbxLog, dDataDe, dDataAte, aFiltro ) }, , 'Atualizando dados, Por favor aguarde' ) }
-Local bReproc 	:= { || FwMsgRun( ,{|| U_ISCH0002( .F., Left(aLbxLog[oLbxLog:nAt,03],3), aLbxLog[oLbxLog:nAt,02] ) }, , 'Reprocessando dados, Por favor aguarde' ) }
-Local aSize 	:= MsAdvSize( .F. )
-Local dDataDe 	:= aParam[1]
-Local dDataAte 	:= aParam[2]
-Local aFiltro 	:= {}
-Local aLbxLog 	:= {}
-Local oLbxLog 	:= Nil
-Local oDlg 		:= Nil
-Local oFWLayer
-Local oWin1
-Local oWin2
+Local oFontLeg := TFont():New("Verdana",,012,,.T.,,,,,.F.,.F.)
+Local oFontPan := TFont():New("Verdana",,012,,.T.,,,,,.F.,.F.)
+Local bCarga := { || FwMsgRun( ,{|| RefBrowse( @aLbxLog, @oLbxLog, dDataDe, dDataAte, aFiltro ) }, , 'Atualizando dados, Por favor aguarde' ) }
+Local bReproc := { || FwMsgRun( ,{|| U_fProcess( .F., Left(aLbxLog[oLbxLog:nAt,03],3), aLbxLog[oLbxLog:nAt,02] ) }, , 'Reprocessando dados, Por favor aguarde' ) }
+Local aSize := MsAdvSize( .F. )
+Local dDataDe := aParam[1]
+Local dDataAte := aParam[2]
+Local aFiltro := {}
+Local aLbxLog := {}
+Local oLbxLog := Nil
+Local oDlg := Nil
+Local oFWLayer := Nil
+Local oWin1 := Nil
+Local oWin2 := Nil
 
 //Define o filtro
-If aParam[03]	//Cliente
+If aParam[03] //Cliente
 	aAdd( aFiltro, "001" )
 EndIf
-If aParam[04]	//Faturamento
+If aParam[04] //Faturamento
 	aAdd( aFiltro, "002" )
 EndIf
-If aParam[05]	//Pedido de Venda
+If aParam[05] //Pedido de Venda
 	aAdd( aFiltro, "003" )
 EndIf
-If aParam[06]	//Nota Fiscal
+If aParam[06] //Nota Fiscal
 	aAdd( aFiltro, "004" )
 EndIf
-If aParam[07]	//Título Finenceiro (PARCELA)
+If aParam[07] //Título Finenceiro (PARCELA)
 	aAdd( aFiltro, "005" )
 EndIf
-If aParam[07]	//Vendedor
+If aParam[07] //Vendedor
 	aAdd( aFiltro, "006" )
 EndIf
 
@@ -202,7 +202,7 @@ Local nY := 0
 
 //Chama funcao de retorno de Query
 For nX := 1 To Len( aFiltro )
-	aRetAux := U_INTPQRY( cEmpAnt, cFilAnt, aFiltro[nX], Nil, dDataDe, dDataAte, Nil )
+	aRetAux := U_FQRYXML( cEmpAnt, cFilAnt, aFiltro[nX], Nil, dDataDe, dDataAte, Nil )
 
 	If Len( aRetAux ) > 0
 		lVazio := .F.
@@ -281,8 +281,7 @@ For nX := 1 To Len( aFiltro )
 				cDestino := "4 - Mídia+"
 			EndIf
 
-			aAdd( aLbxLog,	{;
-							oLegenda,;										//[19] - Legenda
+			aAdd( aLbxLog, {oLegenda,;										//[19] - Legenda
 							aRetAux[nY][01],;								//[01] - ID
 							cProces,;										//[04] - Processo
 							cTransa,;										//[06] - Transacao
@@ -297,7 +296,7 @@ For nX := 1 To Len( aFiltro )
 							aRetAux[nY][11],;								//[11] - XML Enviado
 							aRetAux[nY][15],;								//[15] - XML Retornado
 							aRetAux[nY][18];								//[18] - XML Erro
-							})
+						   })
 		Next( nY )
 	EndIf
 
@@ -308,20 +307,18 @@ If lVazio
 EndIf
 
 oLbxLog:SetArray( aLbxLog )
-oLbxLog:bLine	:= { ||	{;
-						aLbxLog[oLbxLog:nAt,01],;
-						aLbxLog[oLbxLog:nAt,02],;
-						aLbxLog[oLbxLog:nAt,03],;
-						aLbxLog[oLbxLog:nAt,04],;
-						aLbxLog[oLbxLog:nAt,05],;
-						aLbxLog[oLbxLog:nAt,06],;
-						aLbxLog[oLbxLog:nAt,07],;
-						aLbxLog[oLbxLog:nAt,08],;
-						aLbxLog[oLbxLog:nAt,09],;
-						aLbxLog[oLbxLog:nAt,10],;
-						aLbxLog[oLbxLog:nAt,11],;
-						aLbxLog[oLbxLog:nAt,12];
-						}}
+oLbxLog:bLine := {|| {aLbxLog[oLbxLog:nAt,01],;
+					  aLbxLog[oLbxLog:nAt,02],;
+					  aLbxLog[oLbxLog:nAt,03],;
+					  aLbxLog[oLbxLog:nAt,04],;
+					  aLbxLog[oLbxLog:nAt,05],;
+					  aLbxLog[oLbxLog:nAt,06],;
+					  aLbxLog[oLbxLog:nAt,07],;
+					  aLbxLog[oLbxLog:nAt,08],;
+					  aLbxLog[oLbxLog:nAt,09],;
+					  aLbxLog[oLbxLog:nAt,10],;
+					  aLbxLog[oLbxLog:nAt,11],;
+					  aLbxLog[oLbxLog:nAt,12]}}
 oLbxLog:Refresh()
 Return(Nil)
 
@@ -333,30 +330,28 @@ Return(Nil)
 @type			Function
 /*/
 Static Function VisLog( oLbxLog )
-Local cMEnvio	:= oLbxLog:aArray[ oLbxLog:nAT ][ 13 ]
-Local cMRet 	:= oLbxLog:aArray[ oLbxLog:nAT ][ 14 ]
-Local cMErro 	:= oLbxLog:aArray[ oLbxLog:nAT ][ 15 ]
-Local oBtnSair 	:= Nil
-Local oPanelBot	:= Nil
-Local oDlgVis 	:= Nil
+Local cMEnvio := oLbxLog:aArray[ oLbxLog:nAT ][ 13 ]
+Local cMRet := oLbxLog:aArray[ oLbxLog:nAT ][ 14 ]
+Local cMErro := oLbxLog:aArray[ oLbxLog:nAT ][ 15 ]
+Local oBtnSair := Nil
+Local oPanelBot := Nil
+Local oDlgVis := Nil
 
 DEFINE MSDIALOG oDlgVis TITLE "LOG - Visualização" FROM 000, 000 TO 400, 800 COLORS 0, 16777215 PIXEL
+	//Grupos
+	@ 005, 002 GROUP oGrpEnv	TO 175, 132 PROMPT " XML Envio "	OF oDlgVis COLOR 0, 16777215 PIXEL
+	@ 005, 135 GROUP oGrpRet	TO 175, 265 PROMPT " XML Retorno "	OF oDlgVis COLOR 0, 16777215 PIXEL
+	@ 005, 268 GROUP oGrpErro	TO 175, 398 PROMPT " XML Erro "		OF oDlgVis COLOR 0, 16777215 PIXEL
 
-//Grupos
-@ 005, 002 GROUP oGrpEnv	TO 175, 132 PROMPT " XML Envio "	OF oDlgVis COLOR 0, 16777215 PIXEL
-@ 005, 135 GROUP oGrpRet	TO 175, 265 PROMPT " XML Retorno "	OF oDlgVis COLOR 0, 16777215 PIXEL
-@ 005, 268 GROUP oGrpErro	TO 175, 398 PROMPT " XML Erro "		OF oDlgVis COLOR 0, 16777215 PIXEL
+	@ 015, 007 GET oMEnvio	VAR cMEnvio	OF oDlgVis MULTILINE SIZE 120, 155 COLORS 0, 16777215 HSCROLL READONLY PIXEL
+	@ 015, 140 GET oMRet	VAR cMRet	OF oDlgVis MULTILINE SIZE 120, 155 COLORS 0, 16777215 HSCROLL READONLY PIXEL
+	@ 015, 272 GET oMErro	VAR cMErro	OF oDlgVis MULTILINE SIZE 120, 155 COLORS 0, 16777215 HSCROLL READONLY PIXEL
 
-@ 015, 007 GET oMEnvio	VAR cMEnvio	OF oDlgVis MULTILINE SIZE 120, 155 COLORS 0, 16777215 HSCROLL READONLY PIXEL
-@ 015, 140 GET oMRet	VAR cMRet	OF oDlgVis MULTILINE SIZE 120, 155 COLORS 0, 16777215 HSCROLL READONLY PIXEL
-@ 015, 272 GET oMErro	VAR cMErro	OF oDlgVis MULTILINE SIZE 120, 155 COLORS 0, 16777215 HSCROLL READONLY PIXEL
+	@ 180, 000 MSPANEL oPanelBot SIZE 400, 020 OF oDlgVis COLORS 0, 16777215 RAISED
+	oPanelBot:Align 	:= CONTROL_ALIGN_BOTTOM
 
-@ 180, 000 MSPANEL oPanelBot SIZE 400, 020 OF oDlgVis COLORS 0, 16777215 RAISED
-oPanelBot:Align 	:= CONTROL_ALIGN_BOTTOM
-
-@ 001, 001 BTNBMP oBtnSair RESNAME "FINAL" SIZE 050, 038 OF oPanelBot MESSAGE "Sair"
-oBtnSair:Align		:= CONTROL_ALIGN_LEFT
-oBtnSair:bAction	:= { || oDlgVis:End() }
-
+	@ 001, 001 BTNBMP oBtnSair RESNAME "FINAL" SIZE 050, 038 OF oPanelBot MESSAGE "Sair"
+	oBtnSair:Align		:= CONTROL_ALIGN_LEFT
+	oBtnSair:bAction	:= { || oDlgVis:End() }
 ACTIVATE MSDIALOG oDlgVis CENTERED
 Return(Nil)

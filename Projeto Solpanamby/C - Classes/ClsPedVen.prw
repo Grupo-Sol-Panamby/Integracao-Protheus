@@ -5,10 +5,9 @@ User Function ClsPedVen()
 Return Nil
 
 /*/{Protheus.doc} ClsPedVen (PedVenda)
-@description	Classe Responsavel pela gravacao do Pedido de Venda via
-				MsExecAuto.
-@author 		Amedeo D. Paoli Filho
-@version 		1.0
+@description Classe Responsavel pela gravacao do Pedido de Venda via MsExecAuto
+@author Amedeo D. Paoli Filho
+@version 1.0
 /*/
 Class PedVenda From uExecAuto
 	Data cPedido
@@ -22,9 +21,9 @@ Class PedVenda From uExecAuto
 EndClass
 
 /*/{Protheus.doc} New
-@Description	Metodo construtor
-@author 		Amedeo D. Paoli Filho
-@version 		1.0
+@Description Metodo construtor
+@author Amedeo D. Paoli Filho
+@version 1.0
 /*/
 Method New() Class PedVenda
 	_Super:New()
@@ -37,25 +36,25 @@ Method New() Class PedVenda
 Return Self
 
 /*/{Protheus.doc} AddCabec
-@Description	Metodo AddCabec
-@author 		Amedeo D. Paoli Filho
-@version 		1.0
+@Description Metodo AddCabec
+@author Amedeo D. Paoli Filho
+@version 1.0
 /*/
 Method AddCabec(cCampo, xValor) Class PedVenda
 	If AllTrim(cCampo) == "C5_NUM"
-		::cPedido    := xValor
+		::cPedido := xValor
 	ElseIf AllTrim(cCampo) == "C5_EMISSAO"
-		::dEmissao	:= xValor
-	ElseIf Alltrim(cCampo) == "C5_CONDPAG"
-		::cCondPg	:= xValor
+		::dEmissao := xValor
+	ElseIf AllTrim(cCampo) == "C5_CONDPAG"
+		::cCondPg := xValor
 	EndIf
 
 	_Super:AddCabec(cCampo, xValor)
 Return Nil
 
 /*/{Protheus.doc} Gravacao
-@Description	Metodo Gravacao
-@author 		Amedeo D. Paoli Filho
+@Description Metodo Gravacao
+@author Amedeo D. Paoli Filho
 @version 		1.0
 /*/
 Method Gravacao(nOpcao) Class PedVenda
@@ -69,18 +68,19 @@ Method Gravacao(nOpcao) Class PedVenda
 
 	::SetEnv(1, "FAT", .T.)
 
+	dbSelectArea("SC5")
+
 	//=========================================
 	// Inicia transacao
 	//=========================================
 	Begin Transaction
-		If !Empty(::dEmissao)
+		If ! Empty(::dEmissao)
 			dDataBase := ::dEmissao
 		EndIf
 
-		DbSelectArea("SC5")
-		DbSetOrder(1)
+		SC5->(dbSetOrder(1))
 
-	//	If Type("INCLUI") == "U" .Or. Type("ALTERA") == "U"
+	//	If Type("INCLUI") == "U" .OR. Type("ALTERA") == "U"
 			If nOpcao == 3
 				INCLUI := .T.
 				ALTERA := .F.
@@ -99,18 +99,18 @@ Method Gravacao(nOpcao) Class PedVenda
 				lRetorno := .F.
 				::cMensagem := "Numero do Pedido não informado."
 			Else
-				If !SC5->(DbSeek(xFilial("SC5") + ::cPedido))
+				If ! SC5->(dbSeek(xFilial("SC5") + ::cPedido))
 					lRetorno := .F.
 					::cMensagem := "Pedido " + ::cPedido + " não cadastrado."
 				EndIf
 			EndIf
 		Else
-			If !Empty(::cPedido)
-				If SC5->(DbSeek(xFilial("SC5") + ::cPedido))
+			If ! Empty(::cPedido)
+				If SC5->(dbSeek(xFilial("SC5") + ::cPedido))
 					lReserva := .T.
 
-					While SC5->(DbSeek(xFilial("SC5") + ::cPedido))
-						ConfirmSx8()
+					While SC5->(dbSeek(xFilial("SC5") + ::cPedido))
+						ConfirmSX8()
 						::cPedido := GetSX8Num("SC5", "C5_NUM")
 					Enddo
 
@@ -129,7 +129,7 @@ Method Gravacao(nOpcao) Class PedVenda
 		Next nO
 
 		If lRetorno
-			::AddCabec( "C5_FILIAL",	xFilial("SC5") )
+			::AddCabec( "C5_FILIAL", xFilial("SC5") )
 
 			cCabec := ""
 			cItem := ""
@@ -138,7 +138,7 @@ Method Gravacao(nOpcao) Class PedVenda
 				If ValType( ::aCabec[ nTeste ][ 02 ] ) == "C"
 					cCabec += ::aCabec[ nTeste ][ 01 ] + " - " + ::aCabec[ nTeste ][ 02 ] + CRLF
 				ElseIf ValType( ::aCabec[ nTeste ][ 02 ] ) == "N"
-					cCabec += ::aCabec[ nTeste ][ 01 ] + " - " + Alltrim( Str( ::aCabec[ nTeste ][ 02 ] ) ) + CRLF
+					cCabec += ::aCabec[ nTeste ][ 01 ] + " - " + AllTrim( Str( ::aCabec[ nTeste ][ 02 ] ) ) + CRLF
 				ElseIf ValType( ::aCabec[ nTeste ][ 02 ] ) == "D"
 					cCabec += ::aCabec[ nTeste ][ 01 ] + " - " + DtoC( ::aCabec[ nTeste ][ 02 ] ) + CRLF
 				EndIf
@@ -149,7 +149,7 @@ Method Gravacao(nOpcao) Class PedVenda
 					If ValType( ::aItens[ nTeste ][ nTst2 ][ 02 ] ) == "C"
 						cItem += ::aItens[ nTeste ][ nTst2 ][ 01 ] + " - " + ::aItens[ nTeste ][ nTst2 ][ 02 ] + CRLF
 					ElseIf ValType( ::aItens[ nTeste ][ nTst2 ][ 02 ] ) == "N"
-						cItem += ::aItens[ nTeste ][ nTst2 ][ 01 ] + " - " + Alltrim( Str( ::aItens[ nTeste ][ nTst2 ][ 02 ] ) ) + CRLF
+						cItem += ::aItens[ nTeste ][ nTst2 ][ 01 ] + " - " + AllTrim( Str( ::aItens[ nTeste ][ nTst2 ][ 02 ] ) ) + CRLF
 					ElseIf ValType( ::aItens[ nTeste ][ nTst2 ][ 02 ] ) == "D"
 						cItem += ::aItens[ nTeste ][ nTst2 ][ 01 ] + " - " + DtoC( ::aItens[ nTeste ][ nTst2 ][ 02 ] ) + CRLF
 					EndIf
@@ -160,7 +160,7 @@ Method Gravacao(nOpcao) Class PedVenda
 			lRetorno := .F.
 
 			//Gravacao do Pedido de Venda
-			MSExecAuto( {|a, b, c| MATA410(a, b, c)}, ::aCabec, ::aItens, nOpcao, , Nil )
+			MsExecAuto( {|a, b, c| MATA410(a, b, c)}, ::aCabec, ::aItens, nOpcao, , Nil )
 
 			If lMsErroAuto
 				lRetorno := .F.
@@ -174,19 +174,19 @@ Method Gravacao(nOpcao) Class PedVenda
 				EndIf
 
 				If lReserva
-					RollBackSx8()
+					RollBackSX8()
 				EndIf
 			Else
 				lRetorno := .T.
 				::cPedido := SC5->C5_NUM
 
 				If lReserva
-					ConfirmSx8()
+					ConfirmSX8()
 				EndIf
 			EndIf
 		EndIf
 
-		If !lRetorno
+		If ! lRetorno
 			DisarmTransaction()
 		EndIf
 
@@ -200,9 +200,9 @@ Method Gravacao(nOpcao) Class PedVenda
 Return lRetorno
 
 /*/{Protheus.doc} GetNumero
-@Description	Retorna o numero do pedido gerado.
-@author 		Amedeo D. Paoli Filho
-@version 		1.0
+@Description Retorna o numero do pedido gerado.
+@author Amedeo D. Paoli Filho
+@version 1.0
 /*/
 Method GetNumero() Class PedVenda
 Return ::cPedido

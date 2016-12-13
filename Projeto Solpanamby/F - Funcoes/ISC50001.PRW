@@ -17,7 +17,7 @@ ID_PROC	- 001 - Clientes
 		- 002 - Faturamento
 		- 003 – Pedido de Venda
 		- 004 – Nota Fiscal
-		- 005 – Título Finenceiro (PARCELA)
+		- 005 – Título Financeiro (PARCELA)
 		- 006 - Vendedores
 
 ID_TRANS- 1 - Incluir
@@ -82,7 +82,9 @@ Local cAction := ""
 Local cDestino := ""
 Local cIDProc := "003"
 Local cProces := "Pedido de Venda"
+Local cXML := ""
 Local lRet := .T.
+Local nCount := 0
 
 Default nAction := 0
 
@@ -94,7 +96,7 @@ ElseIf SM0->M0_CODIGO == "80" //NOVA BRASIL FM
 	cDestino := "2"
 EndIf
 
-If nAction := 3
+If nAction == 3
 	cAction := "Exclusao"
 EndIf
 
@@ -110,7 +112,7 @@ aAdd(aDados,{"ID_TIT"         ,SC5->C5_PI2})             //CODIGO NO SISTEMA INT
 aAdd(aDados,{"ID_RET"         ,SC5->C5_NUM})             //NUMERO DO PEDIDO DE VENDA
 aAdd(aDados,{"DATA_PROCESSO"  ,SC5->C5_EMISSAO})         //DATA DA BAIXA / CANCELAMENTO / ESTORNO
 
-cXML := fArToXML(aDados,"PARCELA","1.0","UTF-8",@nCount)
+cXML := U_fArToXML(aDados, "PARCELA", "1.0", "UTF-8", @nCount)
 
 cQuery := "INSERT INTO [INTEGRACAO].[dbo].[XML]" + Chr(13) + Chr(10)
 cQuery += "           ([ID_EMP]" + Chr(13) + Chr(10)

@@ -29,9 +29,12 @@
 */
 User Function FA070EST()
 Local aArea := Getarea()
+Local lIntregCom := SuperGetMv('PY_INT001',.T.,.F.) //Parametro responsável por ligar a integração do faturamento com os sistemas legados das empresas de comunicação
 
 If SM0->M0_CODIGO $ "75|80"
-	U_ISE10001(3) //3 - Excluir / 7 – Baixar / 8 - Cancelar
+	If lIntregCom .AND. ! Empty(SE1->E1_XCODEXT)
+		U_ISE10001(3) //3 - Excluir / 7 – Baixar / 8 - Cancelar
+	EndIf
 EndIf
 
 RestArea(aArea)

@@ -347,7 +347,7 @@ aEstrut := { "X3_ARQUIVO", "X3_ORDEM"  , "X3_CAMPO"  , "X3_TIPO"   , "X3_TAMANHO
 //	Chr(128) + Chr(128) + Chr(128) + Chr(128) + Chr(128) + ;
 //	Chr(128) + Chr(128) + Chr(128) + Chr(128) + Chr(128)					, ; //X3_USADO
 //	'V'																		, ; //X3_VISUAL
-/*
+
 //
 // Tabela SA1
 //
@@ -368,7 +368,7 @@ aAdd( aSX3, { ;
 	''																		, ; //X3_VALID
 	Chr(128) + Chr(128) + Chr(128) + Chr(128) + Chr(128) + ;
 	Chr(128) + Chr(128) + Chr(128) + Chr(128) + Chr(128) + ;
-	Chr(128) + Chr(128) + Chr(128) + Chr(128) + Chr(160)					, ; //X3_USADO
+	Chr(128) + Chr(128) + Chr(128) + Chr(128) + Chr(128)					, ; //X3_USADO
 	''																		, ; //X3_RELACAO
 	''																		, ; //X3_F3
 	0																		, ; //X3_NIVEL
@@ -411,7 +411,7 @@ aAdd( aSX3, { ;
 	''																		, ; //X3_VALID
 	Chr(128) + Chr(128) + Chr(128) + Chr(128) + Chr(128) + ;
 	Chr(128) + Chr(128) + Chr(128) + Chr(128) + Chr(128) + ;
-	Chr(128) + Chr(128) + Chr(128) + Chr(128) + Chr(160)					, ; //X3_USADO
+	Chr(128) + Chr(128) + Chr(128) + Chr(128) + Chr(128)					, ; //X3_USADO
 	''																		, ; //X3_RELACAO
 	''																		, ; //X3_F3
 	0																		, ; //X3_NIVEL
@@ -454,7 +454,7 @@ aAdd( aSX3, { ;
 	''																		, ; //X3_VALID
 	Chr(128) + Chr(128) + Chr(128) + Chr(128) + Chr(128) + ;
 	Chr(128) + Chr(128) + Chr(128) + Chr(128) + Chr(128) + ;
-	Chr(128) + Chr(128) + Chr(128) + Chr(128) + Chr(160)					, ; //X3_USADO
+	Chr(128) + Chr(128) + Chr(128) + Chr(128) + Chr(128)					, ; //X3_USADO
 	''																		, ; //X3_RELACAO
 	''																		, ; //X3_F3
 	0																		, ; //X3_NIVEL
@@ -497,7 +497,7 @@ aAdd( aSX3, { ;
 	''																		, ; //X3_VALID
 	Chr(128) + Chr(128) + Chr(128) + Chr(128) + Chr(128) + ;
 	Chr(128) + Chr(128) + Chr(128) + Chr(128) + Chr(128) + ;
-	Chr(128) + Chr(128) + Chr(128) + Chr(128) + Chr(160)					, ; //X3_USADO
+	Chr(128) + Chr(128) + Chr(128) + Chr(128) + Chr(128)					, ; //X3_USADO
 	''																		, ; //X3_RELACAO
 	''																		, ; //X3_F3
 	0																		, ; //X3_NIVEL
@@ -540,7 +540,7 @@ aAdd( aSX3, { ;
 	''																		, ; //X3_VALID
 	Chr(128) + Chr(128) + Chr(128) + Chr(128) + Chr(128) + ;
 	Chr(128) + Chr(128) + Chr(128) + Chr(128) + Chr(128) + ;
-	Chr(128) + Chr(128) + Chr(128) + Chr(128) + Chr(160)					, ; //X3_USADO
+	Chr(128) + Chr(128) + Chr(128) + Chr(128) + Chr(128)					, ; //X3_USADO
 	''																		, ; //X3_RELACAO
 	''																		, ; //X3_F3
 	0																		, ; //X3_NIVEL
@@ -562,7 +562,7 @@ aAdd( aSX3, { ;
 	''																		, ; //X3_GRPSXG
 	''																		, ; //X3_FOLDER
 	''																		} ) //X3_PYME
-*/
+
 //
 // Tabela SF2
 //
@@ -583,7 +583,7 @@ aAdd( aSX3, { ;
 	''																		, ; //X3_VALID
 	Chr(128) + Chr(128) + Chr(128) + Chr(128) + Chr(128) + ;
 	Chr(128) + Chr(128) + Chr(128) + Chr(128) + Chr(128) + ;
-	Chr(128) + Chr(128) + Chr(128) + Chr(128) + Chr(160)					, ; //X3_USADO
+	Chr(128) + Chr(128) + Chr(128) + Chr(128) + Chr(128)					, ; //X3_USADO
 	''																		, ; //X3_RELACAO
 	''																		, ; //X3_F3
 	0																		, ; //X3_NIVEL

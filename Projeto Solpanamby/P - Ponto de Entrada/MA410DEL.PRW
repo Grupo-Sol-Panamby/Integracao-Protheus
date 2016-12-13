@@ -29,6 +29,7 @@ User Function MA410DEL(aPedido)
 Local aArea := SC5->(GetArea())
 Local cSQL += ""
 Local cRevisa := "00"
+Local lIntregCom := SuperGetMv('PY_INT001',.T.,.F.) //Parametro responsável por ligar a integração do faturamento com os sistemas legados das empresas de comunicação
 
 // Exclui vinculos com Pedido Aglutinador
 If SM0->M0_CODIGO $ "10|20|25|26|28"
@@ -83,7 +84,9 @@ If SM0->M0_CODIGO $ "10|80"
 EndIf
 
 If SM0->M0_CODIGO $ "75|80"
-	U_ISC50001(3) //3 - Excluir
+	If lIntregCom .AND. ! Empty(SC5->C5_XCODEXT)
+		U_ISC50001(3) //3 - Excluir
+	EndIf
 EndIf
 
 RestArea(aArea)

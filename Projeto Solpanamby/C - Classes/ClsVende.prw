@@ -5,9 +5,9 @@ User Function ClsVende()
 Return Nil
 
 /*/{Protheus.doc} ClsVende (VendSP)
-@description	Classe para replica de Vendedores
-@author 		Amedeo D. Paoli Filho
-@version 		1.0
+@description Classe para replica de Vendedores via MsExecAuto
+@author Amedeo D. Paoli Filho
+@version 1.0
 /*/
 Class VendSP From uExecAuto
 	Data cCodigo
@@ -19,22 +19,22 @@ Class VendSP From uExecAuto
 EndClass
 
 /*/{Protheus.doc} new
-@Description	Metodo construtor
-@author 		Amedeo D. Paoli Filho
-@version 		1.0
+@Description Metodo construtor
+@author Amedeo D. Paoli Filho
+@version 1.0
 /*/
 Method New() Class VendSP
 	_Super:New()
 
-	::aTabelas	:= {"SA3"}
-	::cFileLog	:= "MATA040.LOG"
-	::cCodigo	:= ""
+	::aTabelas := {"SA3"}
+	::cFileLog := "MATA040.LOG"
+	::cCodigo := ""
 Return Self
 
 /*/{Protheus.doc} AddValues
-@Description	Metodo AddValues
-@author 		Amedeo D. Paoli Filho
-@version 		1.0
+@Description Metodo AddValues
+@author Amedeo D. Paoli Filho
+@version 1.0
 /*/
 Method AddValues(cCampo, xValor) Class VendSP
 	If AllTrim(cCampo) == "A3_COD"
@@ -45,9 +45,9 @@ Method AddValues(cCampo, xValor) Class VendSP
 Return Nil
 
 /*/{Protheus.doc} Gravacao
-@Description	Metodo Gravacao
-@author 		Amedeo D. Paoli Filho
-@version 		1.0
+@Description Metodo Gravacao
+@author Amedeo D. Paoli Filho
+@version 1.0
 /*/
 Method Gravacao(nOpcao) Class VendSP
 	Local lRetorno := .T.
@@ -56,11 +56,11 @@ Method Gravacao(nOpcao) Class VendSP
 
 	::SetEnv(1, "FAT")
 
+	dbSelectArea("SA3")
+	SA3->(dbSetOrder(1))
+
 	// Controle de Transacao
 	Begin Transaction
-		DbSelectArea("SA3")
-		DbSetOrder(1)
-
 		If nOpcao == 3
 			If Empty(::cCodigo)
 				lRetorno := .F.
@@ -71,7 +71,7 @@ Method Gravacao(nOpcao) Class VendSP
 				lRetorno := .F.
 				::cMensagem := "Vendedor não informado."
 			Else
-				If !SA3->(DbSeek(xFilial("SA3") + ::cCodigo))
+				If ! SA3->(dbSeek(xFilial("SA3") + ::cCodigo))
 					//Caso for Alteracao e Nao encontrar, inclui o Vendedor
 					If nOpcao == 4
 						nOpcao := 3
@@ -87,7 +87,7 @@ Method Gravacao(nOpcao) Class VendSP
 			::AddValues("A3_FILIAL", xFilial("SA3"))
 
 			//Gravacao do Pedido de Compra
-			MSExecAuto({|a, b| MATA040(a, b)}, ::aValues, nOpcao)
+			MsExecAuto({|a, b| MATA040(a, b)}, ::aValues, nOpcao)
 
 			If lMsErroAuto
 				lRetorno := .F.
@@ -102,7 +102,7 @@ Method Gravacao(nOpcao) Class VendSP
 			EndIf
 		EndIf
 
-		If !lRetorno
+		If ! lRetorno
 			DisarmTransaction()
 		EndIf
 
@@ -113,9 +113,9 @@ Method Gravacao(nOpcao) Class VendSP
 Return lRetorno
 
 /*/{Protheus.doc} GetCodigo
-@Description	Metodo GetCodigo
-@author 		Amedeo D. Paoli Filho
-@version 		1.0
+@Description Metodo GetCodigo
+@author Amedeo D. Paoli Filho
+@version 1.0
 /*/
 Method GetCodigo() Class VendSP
 Return ::cCodigo

@@ -167,7 +167,7 @@ If ( lOpen := MyOpenSm0(.T.) )
 
 		For nI := 1 To Len( aRecnoSM0 )
 
-			If !( lOpen := MyOpenSm0(.F.) )
+			If !( lOpen := MyOpenSm0(.T.) )
 				MsgStop( "Atualização da empresa " + aRecnoSM0[nI][2] + " não efetuada." )
 				Exit
 			EndIf
@@ -365,6 +365,7 @@ aEval( aEstrut, { |x| x[2] := SX3->( FieldPos( x[1] ) ) } )
 //
 // Campos Tabela SA1
 //
+/*
 aAdd( aSX3, { ;
 	{ 'SA1'																	, .T. }, ; //X3_ARQUIVO
 	{ '30'																	, .T. }, ; //X3_ORDEM
@@ -511,7 +512,7 @@ aAdd( aSX3, { ;
 	{ ''																	, .T. }, ; //X3_AGRUP
 	{ 'N'																	, .T. }, ; //X3_MODAL
 	{ 'S'																	, .T. }} ) //X3_PYME
-
+*/
 aAdd( aSX3, { ;
 	{ 'SA1'																	, .T. }, ; //X3_ARQUIVO
 	{ 'M0'																	, .T. }, ; //X3_ORDEM
@@ -541,8 +542,8 @@ aAdd( aSX3, { ;
 	{ 'A'																	, .T. }, ; //X3_VISUAL
 	{ 'R'																	, .T. }, ; //X3_CONTEXT
 	{ '€'																	, .T. }, ; //X3_OBRIGAT
-	{ 'Pertence("01/02/03/04/05/06/07/08/09/10")'							, .T. }, ; //X3_VLDUSER
-	{ '01=AGENCIA;02=BANCO PRIVADO;03=CARTORIO;04=CLIENTE;05=GOV EST;06=GOV FED;07=GOV MUN;08=GOV MISTO;09=INTERCOMPANY;10=SHOPPING', .T. }, ; //X3_CBOX
+	{ 'Pertence("01/02/03/04/05/06/07/08/09/10/11")'							, .T. }, ; //X3_VLDUSER
+	{ '01=AGENCIA;02=BANCO PRIVADO;03=CARTORIO;04=CLIENTE;05=GOV EST;06=GOV FED;07=GOV MUN;08=GOV MISTO;09=INTERCOMPANY;10=SHOPPING;11=PARTIDO POLITICO', .T. }, ; //X3_CBOX
 	{ ''																	, .T. }, ; //X3_CBOXSPA
 	{ ''																	, .T. }, ; //X3_CBOXENG
 	{ ''																	, .T. }, ; //X3_PICTVAR
@@ -4489,7 +4490,7 @@ Local   oButDMar, oButInv, oButMarc, oButOk, oButCanc
 Local   aMarcadas := {}
 
 
-If !MyOpenSm0(.F.)
+If !MyOpenSm0(.T.)
 	Return aRet
 EndIf
 

@@ -27,9 +27,12 @@
 */
 User Function MA040DAL()
 Local aArea := SA3->(GetArea())
+Local lIntregCom := SuperGetMv('PY_INT001',.T.,.F.) //Parametro responsável por ligar a integração do faturamento com os sistemas legados das empresas de comunicação
 
-If SM0->M0_CODIGO $ "75|80"// .AND. SA3->A3_MSBLQL <> "1"
-	U_ISA30001(INCLUI,ALTERA)
+If SM0->M0_CODIGO $ "75|80"
+	If lIntregCom .AND. ! Empty(SA3->A3_XCODEXT)
+		U_ISA30001(INCLUI,ALTERA)
+	EndIf
 EndIf
 
 RestArea(aArea)
