@@ -8,12 +8,8 @@
 	<TRANSAC></TRANSAC>
 	<ID_ORI></ID_ORI>	<!-- 1 - PROTHEUS | 2 - PULSAR | 3 - SCTV | 4 - MÍDIA+ -->
 	<ID_DES></ID_DES>	<!-- 1 - PROTHEUS | 2 - PULSAR | 3 - SCTV | 4 - MÍDIA+ -->
-	<NOTAS_FISCAIS>
-		<NOTA_FISCAL>
-			<ID_NF></ID_NF>		<!-- CODIGO DA NOTA FISCAL (PULSAR) -->
-			<ID_RET></ID_RET>	<!-- CODIGO DA NOTA FISCAL (PROTHEUS) -->
-			<DATA_PROCESSO></DATA_PROCESSO>	<!-- Data de emissão / cancelamento da nota fiscal -->
-			<HASHCODE></HASHCODE>	<!-- Código de identificação da nota fiscal, para consulta online -->
-		</NOTA_FISCAL>
-	</NOTAS_FISCAIS>
+	<ID_NF></ID_NF>		<!-- CODIGO DA NOTA FISCAL (PULSAR) -->
+	<ID_RET></ID_RET>	<!-- CODIGO DA NOTA FISCAL (PROTHEUS) -->
+	<DATA_PROCESSO></DATA_PROCESSO>	<!-- Data de emissão / cancelamento da nota fiscal -->
+	<HASHCODE></HASHCODE>	<!-- Código de identificação da nota fiscal, para consulta online -->
 </NOTA_FISCAL>

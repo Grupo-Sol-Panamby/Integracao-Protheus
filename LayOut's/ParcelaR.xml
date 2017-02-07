@@ -8,15 +8,11 @@
 	<TRANSAC></TRANSAC>
 	<ID_ORI></ID_ORI>		<!-- 1 - PROTHEUS | 2 - PULSAR | 3 - SCTV | 4 - MÍDIA+ -->
 	<ID_DES></ID_DES>		<!-- 1 - PROTHEUS | 2 - PULSAR | 3 - SCTV | 4 - MÍDIA+ -->
-	<PARCELAS>
-		<PARCELA>
-			<ID_TIT></ID_TIT>	<!-- CODIGO DO TITULO/PARCELA (PULSAR) -->
-			<ID_RET></ID_RET>	<!-- CODIGO DO TITULO/PARCELA (PROTHEUS) -->
-			<DATA_PROCESSO></DATA_PROCESSO>	<!-- Data de baixa da parcela -->
-			<VALOR_BAIXA></VALOR_BAIXA>		<!-- Valor de baixa da parcela -->
-			<VALOR_ACRESCIMO></VALOR_ACRESCIMO>	<!-- Caso não tenha valor, informar 0.00 -->
-			<VALOR_DESCONTO></VALOR_DESCONTO>	<!-- Caso não tenha valor, informar 0.00 -->
-			<OBSERVACOES></OBSERVACOES>
-		</PARCELA>
-	</PARCELAS>
+	<ID_TIT></ID_TIT>	<!-- CODIGO DO TITULO/PARCELA (PULSAR) -->
+	<ID_RET></ID_RET>	<!-- CODIGO DO TITULO/PARCELA (PROTHEUS) -->
+	<DATA_PROCESSO></DATA_PROCESSO>	<!-- Data de baixa da parcela -->
+	<VALOR_BAIXA></VALOR_BAIXA>		<!-- Valor de baixa da parcela -->
+	<VALOR_ACRESCIMO></VALOR_ACRESCIMO>	<!-- Caso não tenha valor, informar 0.00 -->
+	<VALOR_DESCONTO></VALOR_DESCONTO>	<!-- Caso não tenha valor, informar 0.00 -->
+	<OBSERVACOES></OBSERVACOES>
 </PARCELA>

@@ -10,4 +10,5 @@
 	<ID_DES></ID_DES>	<!-- 1 - PROTHEUS | 2 - PULSAR | 3 - SCTV | 4 - MÍDIA+ -->
 	<ID_FAT></ID_FAT>	<!-- CODIGO DO FATURAMENTO (PULSAR) -->
 	<ID_RET></ID_RET>	<!-- CODIGO DO PEDIDO DE VENDA (PROTHEUS) -->
+	<DATA_PROCESSO></DATA_PROCESSO>	<!-- Data de emissão / cancelamento da nota fiscal -->
 </PEDIDO_VENDA>
