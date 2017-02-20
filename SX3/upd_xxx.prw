@@ -368,10 +368,10 @@ aAdd( aSX3, { ;
 	''																		, ; //X3_VALID
 	Chr(128) + Chr(128) + Chr(128) + Chr(128) + Chr(128) + ;
 	Chr(128) + Chr(128) + Chr(128) + Chr(128) + Chr(128) + ;
-	Chr(128) + Chr(128) + Chr(128) + Chr(128) + Chr(128)					, ; //X3_USADO
+	Chr(128) + Chr(128) + Chr(128) + Chr(128) + Chr(160)					, ; //X3_USADO
 	''																		, ; //X3_RELACAO
 	''																		, ; //X3_F3
-	0																		, ; //X3_NIVEL
+	9																		, ; //X3_NIVEL
 	Chr(254) + Chr(192)														, ; //X3_RESERV
 	''																		, ; //X3_CHECK
 	''																		, ; //X3_TRIGGER
@@ -411,10 +411,10 @@ aAdd( aSX3, { ;
 	''																		, ; //X3_VALID
 	Chr(128) + Chr(128) + Chr(128) + Chr(128) + Chr(128) + ;
 	Chr(128) + Chr(128) + Chr(128) + Chr(128) + Chr(128) + ;
-	Chr(128) + Chr(128) + Chr(128) + Chr(128) + Chr(128)					, ; //X3_USADO
+	Chr(128) + Chr(128) + Chr(128) + Chr(128) + Chr(160)					, ; //X3_USADO
 	''																		, ; //X3_RELACAO
 	''																		, ; //X3_F3
-	0																		, ; //X3_NIVEL
+	9																		, ; //X3_NIVEL
 	Chr(254) + Chr(192)														, ; //X3_RESERV
 	''																		, ; //X3_CHECK
 	''																		, ; //X3_TRIGGER
@@ -454,10 +454,10 @@ aAdd( aSX3, { ;
 	''																		, ; //X3_VALID
 	Chr(128) + Chr(128) + Chr(128) + Chr(128) + Chr(128) + ;
 	Chr(128) + Chr(128) + Chr(128) + Chr(128) + Chr(128) + ;
-	Chr(128) + Chr(128) + Chr(128) + Chr(128) + Chr(128)					, ; //X3_USADO
+	Chr(128) + Chr(128) + Chr(128) + Chr(128) + Chr(160)					, ; //X3_USADO
 	''																		, ; //X3_RELACAO
 	''																		, ; //X3_F3
-	0																		, ; //X3_NIVEL
+	9																		, ; //X3_NIVEL
 	Chr(254) + Chr(192)														, ; //X3_RESERV
 	''																		, ; //X3_CHECK
 	''																		, ; //X3_TRIGGER
@@ -497,10 +497,10 @@ aAdd( aSX3, { ;
 	''																		, ; //X3_VALID
 	Chr(128) + Chr(128) + Chr(128) + Chr(128) + Chr(128) + ;
 	Chr(128) + Chr(128) + Chr(128) + Chr(128) + Chr(128) + ;
-	Chr(128) + Chr(128) + Chr(128) + Chr(128) + Chr(128)					, ; //X3_USADO
+	Chr(128) + Chr(128) + Chr(128) + Chr(128) + Chr(160)					, ; //X3_USADO
 	''																		, ; //X3_RELACAO
 	''																		, ; //X3_F3
-	0																		, ; //X3_NIVEL
+	9																		, ; //X3_NIVEL
 	Chr(254) + Chr(192)														, ; //X3_RESERV
 	''																		, ; //X3_CHECK
 	''																		, ; //X3_TRIGGER
@@ -540,10 +540,10 @@ aAdd( aSX3, { ;
 	''																		, ; //X3_VALID
 	Chr(128) + Chr(128) + Chr(128) + Chr(128) + Chr(128) + ;
 	Chr(128) + Chr(128) + Chr(128) + Chr(128) + Chr(128) + ;
-	Chr(128) + Chr(128) + Chr(128) + Chr(128) + Chr(128)					, ; //X3_USADO
+	Chr(128) + Chr(128) + Chr(128) + Chr(128) + Chr(160)					, ; //X3_USADO
 	''																		, ; //X3_RELACAO
 	''																		, ; //X3_F3
-	0																		, ; //X3_NIVEL
+	9																		, ; //X3_NIVEL
 	Chr(254) + Chr(192)														, ; //X3_RESERV
 	''																		, ; //X3_CHECK
 	''																		, ; //X3_TRIGGER
@@ -583,10 +583,10 @@ aAdd( aSX3, { ;
 	''																		, ; //X3_VALID
 	Chr(128) + Chr(128) + Chr(128) + Chr(128) + Chr(128) + ;
 	Chr(128) + Chr(128) + Chr(128) + Chr(128) + Chr(128) + ;
-	Chr(128) + Chr(128) + Chr(128) + Chr(128) + Chr(128)					, ; //X3_USADO
+	Chr(128) + Chr(128) + Chr(128) + Chr(128) + Chr(160)					, ; //X3_USADO
 	''																		, ; //X3_RELACAO
 	''																		, ; //X3_F3
-	0																		, ; //X3_NIVEL
+	9																		, ; //X3_NIVEL
 	Chr(254) + Chr(192)														, ; //X3_RESERV
 	''																		, ; //X3_CHECK
 	''																		, ; //X3_TRIGGER
