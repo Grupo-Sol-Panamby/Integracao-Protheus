@@ -182,6 +182,12 @@ If ( lOpen := MyOpenSm0(.T.) )
 			oProcess:SetRegua1( 8 )
 
 			//ÚÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ¿
+			//³Atualiza o dicionário SX6         ³
+			//ÀÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÙ
+			oProcess:IncRegua1( "Dicionário de parâmetros" + " - " + SM0->M0_CODIGO + " " + SM0->M0_NOME + " ..." )
+			FSAtuSX6( @cTexto )
+
+			//ÚÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ¿
 			//³Atualiza o dicionário SX3         ³
 			//ÀÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÙ
 			FSAtuSX3( @cTexto )
@@ -715,6 +721,125 @@ For nI := 1 To Len( aSX3 )
 Next nI
 
 cTexto += CRLF + "Final da Atualizacao" + " SX3" + CRLF + Replicate( "-", 128 ) + CRLF + CRLF
+
+Return NIL
+
+
+/*
+ÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜ
+±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±
+±±ÉÍÍÍÍÍÍÍÍÍÍÑÍÍÍÍÍÍÍÍÍÍËÍÍÍÍÍÍÍÑÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍËÍÍÍÍÍÍÑÍÍÍÍÍÍÍÍÍÍÍÍÍ»±±
+±±º Programa ³ FSAtuSX6 º Autor ³ TOTVS Protheus     º Data ³  19/11/13   º±±
+±±ÌÍÍÍÍÍÍÍÍÍÍØÍÍÍÍÍÍÍÍÍÍÊÍÍÍÍÍÍÍÏÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÊÍÍÍÍÍÍÏÍÍÍÍÍÍÍÍÍÍÍÍÍ¹±±
+±±º Descricao³ Funcao de processamento da gravacao do SX6 - Parâmetros    ³±±
+±±º          ³                                                            º±±
+±±ÌÍÍÍÍÍÍÍÍÍÍØÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍ¹±±
+±±³ Uso      ³ FSAtuSX6   - Gerado por EXPORDIC / Upd. V.4.10.8 EFS       ³±±
+±±ÈÍÍÍÍÍÍÍÍÍÍÏÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍ¼±±
+±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±
+ßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßß
+*/
+Static Function FSAtuSX6( cTexto )
+Local aEstrut   := {}
+Local aSX6      := {}
+Local cAlias    := ""
+Local cMsg      := ""
+Local lContinua := .T.
+Local lReclock  := .T.
+Local lTodosNao := .F.
+Local lTodosSim := .F.
+Local nI        := 0
+Local nJ        := 0
+Local nOpcA     := 0
+Local nTamFil   := Len( SX6->X6_FIL )
+Local nTamVar   := Len( SX6->X6_VAR )
+
+cTexto  += "Inicio da Atualizacao" + " SX6" + CRLF + CRLF
+
+//aEstrut := { "X6_FIL", "X6_VAR", "X6_TIPO", "X6_CONTEUD", "X6_CONTSPA", "X6_CONTENG", "X6_PROPRI" , "X6_PYME" }
+  aEstrut := { "X6_FIL", "X6_VAR", "X6_TIPO", "X6_CONTEUD", "X6_CONTSPA", "X6_CONTENG", "X6_DESCRIC", "X6_DSCSPA", "X6_DSCENG", "X6_DESC1", "X6_DSCSPA1", "X6_DSCENG1", "X6_DESC2", "X6_DSCSPA2", "X6_DSCENG2", "X6_PROPRI" , "X6_PYME" }
+//RSP
+aAdd( aSX6, { ;
+	'  '																	, ; //X6_FIL
+	'PY_INT001'																, ; //X6_VAR
+	'L'																		, ; //X6_TIPO
+	'.T.'																	, ; //X6_CONTEUD
+	'.T.'																	, ; //X6_CONTSPA
+	'.T.'																	, ; //X6_CONTENG
+	'Ativa a integracao do faturamento com sistemas das'					, ; //"X6_DESCRIC"
+	' '																		, ; //"X6_DSCSPA"
+	' '																		, ; //"X6_DSCENG"
+	' empresas de comunicacao'												, ; //"X6_DESC1"
+	' '																		, ; //"X6_DSCSPA1"
+	' '																		, ; //"X6_DSCENG1"
+	' '																		, ; //"X6_DESC2"
+	' '																		, ; //"X6_DSCSPA2"
+	' '																		, ; //"X6_DSCENG2"
+	'S'																		, ; //X6_PROPRI
+	'S'																		} ) //X6_PYME
+
+aAdd( aSX6, { ;
+	'  '																	, ; //X6_FIL
+	'PY_INT002'																, ; //X6_VAR
+	'L'																		, ; //X6_TIPO
+	'Ativa a integracao completa incluindo nota fiscal e '					, ; //"X6_DESCRIC"
+	' '																		, ; //"X6_DSCSPA"
+	' '																		, ; //"X6_DSCENG"
+	' financeiro ou apenas pedido de compras'								, ; //"X6_DESC1"
+	' '																		, ; //"X6_DSCSPA1"
+	' '																		, ; //"X6_DSCENG1"
+	' '																		, ; //"X6_DESC2"
+	' '																		, ; //"X6_DSCSPA2"
+	' '																		, ; //"X6_DSCENG2"
+	'.F.'																	, ; //X6_CONTEUD
+	'.F.'																	, ; //X6_CONTSPA
+	'.F.'																	, ; //X6_CONTENG
+	'S'																		, ; //X6_PROPRI
+	'S'																		} ) //X6_PYME
+
+
+//
+// Atualizando dicionário
+//
+oProcess:SetRegua2( Len( aSX6 ) )
+
+dbSelectArea( "SX6" )
+dbSetOrder( 1 )
+
+For nI := 1 To Len( aSX6 )
+	lContinua := .F.
+	lReclock  := .F.
+
+	If !SX6->( dbSeek( PadR( aSX6[nI][1], nTamFil ) + PadR( aSX6[nI][2], nTamVar ) ) )
+		lContinua := .T.
+		lReclock  := .T.
+		cTexto += "Foi incluído o parâmetro " + aSX6[nI][1] + aSX6[nI][2] + " Conteúdo [" + AllTrim( aSX6[nI][4] ) + "]"+ CRLF
+	Else
+		lContinua := .T.
+		lReclock  := .F.
+		cTexto += "Foi alterado o parâmetro " + aSX6[nI][1] + aSX6[nI][2] + " Conteúdo [" + AllTrim( aSX6[nI][4] ) + "]"+ CRLF
+	EndIf
+
+	If lContinua
+		If !( aSX6[nI][1] $ cAlias )
+			cAlias += aSX6[nI][1] + "/"
+		EndIf
+
+		RecLock( "SX6", lReclock )
+		For nJ := 1 To Len( aSX6[nI] )
+			If FieldPos( aEstrut[nJ] ) > 0
+				FieldPut( FieldPos( aEstrut[nJ] ), aSX6[nI][nJ] )
+			EndIf
+		Next nJ
+		dbCommit()
+		MsUnLock()
+	EndIf
+
+	oProcess:IncRegua2( "Atualizando Arquivos (SX6)..." )
+
+Next nI
+
+cTexto += CRLF + "Final da Atualizacao" + " SX6" + CRLF + Replicate( "-", 128 ) + CRLF + CRLF
 
 Return NIL
 
