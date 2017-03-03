@@ -19,6 +19,9 @@
 	<VIG_INI></VIG_INI>	<!-- Início de veiculação -->
 	<VIG_FIM></VIG_FIM>	<!-- Término de veiculação -->
 	<TOT_INS></TOT_INS>
+	<CAMPANHA></CAMPANHA>
+	<PRODUTO></PRODUTO>
+	<PI></PI>
 	<ITENS>
 		<ITEM>
 			<SEQ></SEQ>

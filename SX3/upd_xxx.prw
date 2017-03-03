@@ -184,8 +184,8 @@ If ( lOpen := MyOpenSm0(.T.) )
 			//ÚÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ¿
 			//³Atualiza o dicionário SX6         ³
 			//ÀÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÙ
-			oProcess:IncRegua1( "Dicionário de parâmetros" + " - " + SM0->M0_CODIGO + " " + SM0->M0_NOME + " ..." )
-			FSAtuSX6( @cTexto )
+//			oProcess:IncRegua1( "Dicionário de parâmetros" + " - " + SM0->M0_CODIGO + " " + SM0->M0_NOME + " ..." )
+//			FSAtuSX6( @cTexto )
 
 			//ÚÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ¿
 			//³Atualiza o dicionário SX3         ³
@@ -507,6 +507,126 @@ aAdd( aSX3, { ;
 	''																		, ; //X3_RELACAO
 	''																		, ; //X3_F3
 	9																		, ; //X3_NIVEL
+	Chr(254) + Chr(192)														, ; //X3_RESERV
+	''																		, ; //X3_CHECK
+	''																		, ; //X3_TRIGGER
+	'U'																		, ; //X3_PROPRI
+	'N'																		, ; //X3_BROWSE
+	'A'																		, ; //X3_VISUAL
+	'R'																		, ; //X3_CONTEXT
+	''																		, ; //X3_OBRIGAT
+	''																		, ; //X3_VLDUSER
+	''																		, ; //X3_CBOX
+	''																		, ; //X3_CBOXSPA
+	''																		, ; //X3_CBOXENG
+	''																		, ; //X3_PICTVAR
+	''																		, ; //X3_WHEN
+	''																		, ; //X3_INIBRW
+	''																		, ; //X3_GRPSXG
+	''																		, ; //X3_FOLDER
+	''																		} ) //X3_PYME
+
+aAdd( aSX3, { ;
+	'SC5'																	, ; //X3_ARQUIVO
+	'ZZ'																	, ; //X3_ORDEM
+	'C5_XVLRAGE'															, ; //X3_CAMPO
+	'N'																		, ; //X3_TIPO
+	12																		, ; //X3_TAMANHO
+	2																		, ; //X3_DECIMAL
+	'Comissao Age'															, ; //X3_TITULO
+	'Comissao Age'															, ; //X3_TITSPA
+	'Comissao Age'															, ; //X3_TITENG
+	'Valor Comissao Agencia'												, ; //X3_DESCRIC
+	'Valor Comissao Agencia'												, ; //X3_DESCSPA
+	'Valor Comissao Agencia'												, ; //X3_DESCENG
+	'@E 999,999,999.99'														, ; //X3_PICTURE
+	'positivo() .or. vazio()'												, ; //X3_VALID
+	Chr(128) + Chr(128) + Chr(128) + Chr(128) + Chr(128) + ;
+	Chr(128) + Chr(128) + Chr(128) + Chr(128) + Chr(128) + ;
+	Chr(128) + Chr(128) + Chr(128) + Chr(128) + Chr(160)					, ; //X3_USADO
+	''																		, ; //X3_RELACAO
+	''																		, ; //X3_F3
+	1																		, ; //X3_NIVEL
+	Chr(154) + Chr(192)														, ; //X3_RESERV
+	''																		, ; //X3_CHECK
+	''																		, ; //X3_TRIGGER
+	''																		, ; //X3_PROPRI
+	'N'																		, ; //X3_BROWSE
+	'A'																		, ; //X3_VISUAL
+	'R'																		, ; //X3_CONTEXT
+	''																		, ; //X3_OBRIGAT
+	''																		, ; //X3_VLDUSER
+	''																		, ; //X3_CBOX
+	''																		, ; //X3_CBOXSPA
+	''																		, ; //X3_CBOXENG
+	''																		, ; //X3_PICTVAR
+	''																		, ; //X3_WHEN
+	''																		, ; //X3_INIBRW
+	''																		, ; //X3_GRPSXG
+	''																		, ; //X3_FOLDER
+	''																		} ) //X3_PYME
+
+aAdd( aSX3, { ;
+	'SC5'																	, ; //X3_ARQUIVO
+	'ZZ'																	, ; //X3_ORDEM
+	'C5_XDATINI'															, ; //X3_CAMPO
+	'D'																		, ; //X3_TIPO
+	8																		, ; //X3_TAMANHO
+	0																		, ; //X3_DECIMAL
+	'Dt Ini Veicu'															, ; //X3_TITULO
+	'Dt Ini Veicu'															, ; //X3_TITSPA
+	'Dt Ini Veicu'															, ; //X3_TITENG
+	'Inicio da veiculacao   '												, ; //X3_DESCRIC
+	'Inicio da veiculacao   '												, ; //X3_DESCSPA
+	'Inicio da veiculacao   '												, ; //X3_DESCENG
+	''																		, ; //X3_PICTURE
+	''																		, ; //X3_VALID
+	Chr(128) + Chr(128) + Chr(128) + Chr(128) + Chr(128) + ;
+	Chr(128) + Chr(128) + Chr(128) + Chr(128) + Chr(128) + ;
+	Chr(128) + Chr(128) + Chr(128) + Chr(128) + Chr(160)					, ; //X3_USADO
+	''																		, ; //X3_RELACAO
+	''																		, ; //X3_F3
+	0																		, ; //X3_NIVEL
+	Chr(254) + Chr(192)														, ; //X3_RESERV
+	''																		, ; //X3_CHECK
+	''																		, ; //X3_TRIGGER
+	'U'																		, ; //X3_PROPRI
+	'N'																		, ; //X3_BROWSE
+	'A'																		, ; //X3_VISUAL
+	'R'																		, ; //X3_CONTEXT
+	''																		, ; //X3_OBRIGAT
+	''																		, ; //X3_VLDUSER
+	''																		, ; //X3_CBOX
+	''																		, ; //X3_CBOXSPA
+	''																		, ; //X3_CBOXENG
+	''																		, ; //X3_PICTVAR
+	''																		, ; //X3_WHEN
+	''																		, ; //X3_INIBRW
+	''																		, ; //X3_GRPSXG
+	''																		, ; //X3_FOLDER
+	''																		} ) //X3_PYME
+
+aAdd( aSX3, { ;
+	'SC5'																	, ; //X3_ARQUIVO
+	'ZZ'																	, ; //X3_ORDEM
+	'C5_XDATFIM'															, ; //X3_CAMPO
+	'D'																		, ; //X3_TIPO
+	8																		, ; //X3_TAMANHO
+	0																		, ; //X3_DECIMAL
+	'Dt Fim Veicu'															, ; //X3_TITULO
+	'Dt Fim Veicu'															, ; //X3_TITSPA
+	'Dt Fim Veicu'															, ; //X3_TITENG
+	'Fim da veiculacao      '												, ; //X3_DESCRIC
+	'Fim da veiculacao      '												, ; //X3_DESCSPA
+	'Fim da veiculacao      '												, ; //X3_DESCENG
+	''																		, ; //X3_PICTURE
+	''																		, ; //X3_VALID
+	Chr(128) + Chr(128) + Chr(128) + Chr(128) + Chr(128) + ;
+	Chr(128) + Chr(128) + Chr(128) + Chr(128) + Chr(128) + ;
+	Chr(128) + Chr(128) + Chr(128) + Chr(128) + Chr(160)					, ; //X3_USADO
+	''																		, ; //X3_RELACAO
+	''																		, ; //X3_F3
+	0																		, ; //X3_NIVEL
 	Chr(254) + Chr(192)														, ; //X3_RESERV
 	''																		, ; //X3_CHECK
 	''																		, ; //X3_TRIGGER
