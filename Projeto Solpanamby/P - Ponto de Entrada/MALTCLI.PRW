@@ -10,7 +10,7 @@
 ฑฑฬออออออออออออุออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออนฑฑ
 ฑฑบ Descricao  ณ Ponto de entrada apos a alteracao no cadasdro de cliente       บฑฑ
 ฑฑฬออออออออออออุออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออนฑฑ
-ฑฑบ Modulo     ณ SIGACOM                                                        บฑฑ
+ฑฑบ Modulo     ณ SIGAFAT                                                        บฑฑ
 ฑฑฬออออออออออออุออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออนฑฑ
 ฑฑบ Uso        ณ Ponto de Entrada                                               บฑฑ
 ฑฑฬออออออออออออุออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออนฑฑ
@@ -27,11 +27,14 @@
 */
 User Function MALTCLI()
 Local aArea := SA1->(GetArea())
-Local lIntregCom := SuperGetMv('PY_INT001',.T.,.F.) //Parametro responsแvel por ligar a integra็ใo do faturamento com os sistemas legados das empresas de comunica็ใo
+Local lIntregCom := SuperGetMv('PY_INT001', .T., .F.) //Parametro responsแvel por ligar a integra็ใo do faturamento com os sistemas legados das empresas de comunica็ใo
+Local cOPCBLQL := ""
 
 If SM0->M0_CODIGO $ "75|80"
-	If lIntregCom .AND. ! Empty(SA1->A1_XCODEXT)
-		U_ISA10001(INCLUI,ALTERA)
+	If lIntregCom //.AND. ! Empty(SA1->A1_XCODEXT)
+		cOPCBLQL := GetMV("PY_OPCBLQL", .T., "")
+		U_ISA10001(INCLUI, ALTERA, @cOPCBLQL)
+		PutMV("PY_OPCBLQL", cOPCBLQL)
 	EndIf
 EndIf
 

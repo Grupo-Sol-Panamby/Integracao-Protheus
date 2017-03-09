@@ -59,9 +59,10 @@ STATUS	- 0 - AGUARDANDO PROCESSAMENTO
 ±±ÌÍÍÍÍÍÍÍÍÍÍÍÍØÍÍÍÍÍÍÍÍÍÍÍÍÊÍÍÍÍÍÍÍÏÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÊÍÍÍÍÍÍÏÍÍÍÍÍÍÍÍÍÍÍÍ¹±±
 ±±º Empresa    ³ Sol Panamby                                                    º±±
 ±±ÌÍÍÍÍÍÍÍÍÍÍÍÍØÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍ¹±±
-±±º Descricao  ³ Integracao TOTVS Protheus vs Pulsar                            º±±
+±±º Descricao  ³ Integracao TOTVS Protheus vs Sistemas Legados das empresas de  º±±
+±±º            ³ Comunicacao                                                    º±±
 ±±ÌÍÍÍÍÍÍÍÍÍÍÍÍØÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍ¹±±
-±±º Modulo     ³ Integracao                                                     º±±
+±±º Modulo     ³ SIGAFAT                                                        º±±
 ±±ÌÍÍÍÍÍÍÍÍÍÍÍÍØÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍ¹±±
 ±±º Uso        ³ Integracao do cadastro de clientes                             º±±
 ±±ÌÍÍÍÍÍÍÍÍÍÍÍÍØÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍ¹±±
@@ -77,7 +78,7 @@ STATUS	- 0 - AGUARDANDO PROCESSAMENTO
 ±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±
 ÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜ
 */
-User Function ISA10001(lInclui,lAltera,lRetorno,nID) //U_ISA10001(.F.,.F.,.T.)
+User Function ISA10001(lInclui,lAltera,cOpc,lRetorno,nID) //U_ISA10001(.F.,.F.,.T.)
 Local aDados := {}
 Local aContatos := {}
 Local aIntegra := {}
@@ -98,6 +99,7 @@ Local oXML
 
 Default lInclui := .F.
 Default lAltera := .F.
+Default cOpc := ""
 Default lRetorno := .F.
 Default nID := 0
 
@@ -208,15 +210,25 @@ If lRetorno
 		Next(nX)
 	EndIf
 Else
-	If lInclui
-		nAction := 1
-		cAction := "Inclusao"
-	ElseIf lAltera
-		nAction := 2
-		cAction := "Alteracao"
-	Else
-		nAction := 3
-		cAction := "Exclusao"
+	If Empty(cOpc)
+		If lInclui
+			nAction := 1
+			cAction := "Inclusao"
+		ElseIf lAltera
+			nAction := 2
+			cAction := "Alteracao"
+		Else
+			nAction := 3
+			cAction := "Exclusao"
+		EndIf
+	ElseIf cOpc == "1"
+		nAction := 4
+		cAction := "Bloquear"
+		cOpc := ""
+	ElseIf cOpc == "2"
+		nAction := 5
+		cAction := "Desbloquear"
+		cOpc := ""
 	EndIf
 
 	aAdd(aDados,{"ID_EMP"         ,cEmpAnt})                 //80 - RCC
@@ -236,7 +248,7 @@ Else
 	aAdd(aDados,{"TIPO"           ,SA1->A1_TIPO})            //TIPO (F - CONSUNIDOR FINAL | L - PRODUTOR RURAL | R - REVENDEDOR | S - SOLIDARIO | X - EXPORTACAO)
 	aAdd(aDados,{"TIPO_PESSOA"    ,SA1->A1_TPESSOA})         //TIPO PESSOA (CI - COMERCIO/INDUSTRIA | PF - PESSOA FISICA | OS - PRESTACAO DE SERVICO | EP - EMPRESA PUBLICA)
 	aAdd(aDados,{"TIPO_CLIENTE"   ,SA1->A1_XTPCLI})          //TIPO CLIENTE (1 - CLIENTE | 2 - AGENCIA | 3 - AMBOS)
-	aAdd(aDados,{"GRUPO"          ,SA1->A1_GRPCLI})          //GRUPO CLIENTE (01 - AGENCIA | 02-BANCO PRIVADO | 03-CARTORIO | 04-CLIENTE | 05-GOV EST | 06-GOV FED | 07-GOV MUN | 08-GOV MISTO | 09-INTERCOMPANY | 10-SHOPPING | 11 - PARTIDO POLITICO)
+	aAdd(aDados,{"GRUPO"          ,SA1->A1_GRPCLI})          //GRUPO CLIENTE (01 - AGENCIA | 02 - BANCO PRIVADO | 03 - CARTORIO | 04 - CLIENTE | 05 - GOV EST | 06 - GOV FED | 07 - GOV MUN | 08 - GOV MISTO | 09 - INTERCOMPANY | 10 - SHOPPING | 11 - PARTIDO POLITICO)
 	aAdd(aDados,{"BLOQUEADO"      ,SA1->A1_MSBLQL})          //BLOQUEADO (1 - SIM | 2 - NAO)
 	aAdd(aDados,{"INS_ESTAD"      ,SA1->A1_INSCR})           //INS. ESTAD
 	aAdd(aDados,{"INS_MUNICIP"    ,SA1->A1_INSCRM})          //INS. MUNICIP

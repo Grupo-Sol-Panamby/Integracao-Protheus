@@ -184,13 +184,13 @@ If ( lOpen := MyOpenSm0(.T.) )
 			//ÚÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ¿
 			//³Atualiza o dicionário SX6         ³
 			//ÀÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÙ
-//			oProcess:IncRegua1( "Dicionário de parâmetros" + " - " + SM0->M0_CODIGO + " " + SM0->M0_NOME + " ..." )
-//			FSAtuSX6( @cTexto )
+			oProcess:IncRegua1( "Dicionário de parâmetros" + " - " + SM0->M0_CODIGO + " " + SM0->M0_NOME + " ..." )
+			FSAtuSX6( @cTexto )
 
 			//ÚÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ¿
 			//³Atualiza o dicionário SX3         ³
 			//ÀÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÙ
-			FSAtuSX3( @cTexto )
+//			FSAtuSX3( @cTexto )
 
 			oProcess:IncRegua1( "Dicionário de dados" + " - " + SM0->M0_CODIGO + " " + SM0->M0_NOME + " ..." )
 			oProcess:IncRegua2( "Atualizando campos/índices" )
@@ -902,6 +902,9 @@ aAdd( aSX6, { ;
 	'  '																	, ; //X6_FIL
 	'PY_INT002'																, ; //X6_VAR
 	'L'																		, ; //X6_TIPO
+	'.T.'																	, ; //X6_CONTEUD
+	'.T.'																	, ; //X6_CONTSPA
+	'.T.'																	, ; //X6_CONTENG
 	'Ativa a integracao completa incluindo nota fiscal e '					, ; //"X6_DESCRIC"
 	' '																		, ; //"X6_DSCSPA"
 	' '																		, ; //"X6_DSCENG"
@@ -911,9 +914,25 @@ aAdd( aSX6, { ;
 	' '																		, ; //"X6_DESC2"
 	' '																		, ; //"X6_DSCSPA2"
 	' '																		, ; //"X6_DSCENG2"
-	'.F.'																	, ; //X6_CONTEUD
-	'.F.'																	, ; //X6_CONTSPA
-	'.F.'																	, ; //X6_CONTENG
+	'S'																		, ; //X6_PROPRI
+	'S'																		} ) //X6_PYME
+
+aAdd( aSX6, { ;
+	'  '																	, ; //X6_FIL
+	'PY_OPCBLQL'															, ; //X6_VAR
+	'C'																		, ; //X6_TIPO
+	''																		, ; //X6_CONTEUD
+	''																		, ; //X6_CONTSPA
+	''																		, ; //X6_CONTENG
+	'Guarda a transacao que esta sendo executada na int'					, ; //"X6_DESCRIC"
+	' '																		, ; //"X6_DSCSPA"
+	' '																		, ; //"X6_DSCENG"
+	'egracao do faturamento. Nao alterar esse parametro'					, ; //"X6_DESC1"
+	' '																		, ; //"X6_DSCSPA1"
+	' '																		, ; //"X6_DSCENG1"
+	' pois o mesmo e utilizado por rotinas customizadas'					, ; //"X6_DESC2"
+	' '																		, ; //"X6_DSCSPA2"
+	' '																		, ; //"X6_DSCENG2"
 	'S'																		, ; //X6_PROPRI
 	'S'																		} ) //X6_PYME
 
