@@ -185,12 +185,12 @@ If ( lOpen := MyOpenSm0(.T.) )
 			//³Atualiza o dicionário SX6         ³
 			//ÀÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÙ
 			oProcess:IncRegua1( "Dicionário de parâmetros" + " - " + SM0->M0_CODIGO + " " + SM0->M0_NOME + " ..." )
-			FSAtuSX6( @cTexto )
+//			FSAtuSX6( @cTexto )
 
 			//ÚÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ¿
 			//³Atualiza o dicionário SX3         ³
 			//ÀÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÙ
-//			FSAtuSX3( @cTexto )
+			FSAtuSX3( @cTexto )
 
 			oProcess:IncRegua1( "Dicionário de dados" + " - " + SM0->M0_CODIGO + " " + SM0->M0_NOME + " ..." )
 			oProcess:IncRegua2( "Atualizando campos/índices" )
@@ -354,6 +354,49 @@ aEstrut := { "X3_ARQUIVO", "X3_ORDEM"  , "X3_CAMPO"  , "X3_TIPO"   , "X3_TAMANHO
 //	Chr(128) + Chr(128) + Chr(128) + Chr(128) + Chr(128)					, ; //X3_USADO
 //	'V'																		, ; //X3_VISUAL
 
+//
+// Tabela SB1
+//
+aAdd( aSX3, { ;
+	'SB1'																	, ; //X3_ARQUIVO
+	'ZZ'																	, ; //X3_ORDEM
+	'B1_XCODEXT'															, ; //X3_CAMPO
+	'C'																		, ; //X3_TIPO
+	10																		, ; //X3_TAMANHO
+	0																		, ; //X3_DECIMAL
+	'Cod Externo'															, ; //X3_TITULO
+	'Cod Externo'															, ; //X3_TITSPA
+	'Cod Externo'															, ; //X3_TITENG
+	'Cod Produto Externo'													, ; //X3_DESCRIC
+	'Cod Produto Externo'													, ; //X3_DESCSPA
+	'Cod Produto Externo'													, ; //X3_DESCENG
+	'@!'																	, ; //X3_PICTURE
+	''																		, ; //X3_VALID
+	Chr(128) + Chr(128) + Chr(128) + Chr(128) + Chr(128) + ;
+	Chr(128) + Chr(128) + Chr(128) + Chr(128) + Chr(128) + ;
+	Chr(128) + Chr(128) + Chr(128) + Chr(128) + Chr(160)					, ; //X3_USADO
+	''																		, ; //X3_RELACAO
+	''																		, ; //X3_F3
+	9																		, ; //X3_NIVEL
+	Chr(254) + Chr(192)														, ; //X3_RESERV
+	''																		, ; //X3_CHECK
+	''																		, ; //X3_TRIGGER
+	'U'																		, ; //X3_PROPRI
+	'N'																		, ; //X3_BROWSE
+	'A'																		, ; //X3_VISUAL
+	'R'																		, ; //X3_CONTEXT
+	''																		, ; //X3_OBRIGAT
+	''																		, ; //X3_VLDUSER
+	''																		, ; //X3_CBOX
+	''																		, ; //X3_CBOXSPA
+	''																		, ; //X3_CBOXENG
+	''																		, ; //X3_PICTVAR
+	''																		, ; //X3_WHEN
+	''																		, ; //X3_INIBRW
+	''																		, ; //X3_GRPSXG
+	''																		, ; //X3_FOLDER
+	''																		} ) //X3_PYME
+/*
 //
 // Tabela SA1
 //
@@ -731,7 +774,7 @@ aAdd( aSX3, { ;
 	''																		, ; //X3_GRPSXG
 	''																		, ; //X3_FOLDER
 	''																		} ) //X3_PYME
-
+*/
 //
 // Atualizando dicionário
 //
@@ -883,9 +926,9 @@ aAdd( aSX6, { ;
 	'  '																	, ; //X6_FIL
 	'PY_INT001'																, ; //X6_VAR
 	'L'																		, ; //X6_TIPO
-	'.T.'																	, ; //X6_CONTEUD
-	'.T.'																	, ; //X6_CONTSPA
-	'.T.'																	, ; //X6_CONTENG
+	'.F.'																	, ; //X6_CONTEUD
+	'.F.'																	, ; //X6_CONTSPA
+	'.F.'																	, ; //X6_CONTENG
 	'Ativa a integracao do faturamento com sistemas das'					, ; //"X6_DESCRIC"
 	' '																		, ; //"X6_DSCSPA"
 	' '																		, ; //"X6_DSCENG"
@@ -902,9 +945,9 @@ aAdd( aSX6, { ;
 	'  '																	, ; //X6_FIL
 	'PY_INT002'																, ; //X6_VAR
 	'L'																		, ; //X6_TIPO
-	'.T.'																	, ; //X6_CONTEUD
-	'.T.'																	, ; //X6_CONTSPA
-	'.T.'																	, ; //X6_CONTENG
+	'.F.'																	, ; //X6_CONTEUD
+	'.F.'																	, ; //X6_CONTSPA
+	'.F.'																	, ; //X6_CONTENG
 	'Ativa a integracao completa incluindo nota fiscal e '					, ; //"X6_DESCRIC"
 	' '																		, ; //"X6_DSCSPA"
 	' '																		, ; //"X6_DSCENG"
